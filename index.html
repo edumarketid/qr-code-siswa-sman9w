@@ -1127,371 +1127,112 @@ html.scanner-mode .container {
 </style>
 
 
-<style id="FINAL_RESPONSIVE_LAYOUT">
+<style id="FINAL_RESPONSIVE_LAYOUT_FIXED">
 /* =========================================================
-   FINAL RESPONSIVE LAYOUT
-   Hanya mengatur tampilan. Tidak mengubah fungsi JS.
+   PERBAIKAN CSS UTAMA — DESKTOP & MOBILE RESPONSIVE
    ========================================================= */
 
-*,
-*::before,
-*::after{
-  box-sizing:border-box;
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
-html{
-  width:100%;
-  min-height:100%;
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f8fc;
 }
 
-body{
-  width:100%;
-  min-height:100vh;
+/* Container Pusat Desktop */
+html.scanner-mode body {
+  padding: 20px 10px;
+  min-height: 100vh;
 }
 
-/* =========================
-   LOGIN — DESKTOP
-   ========================= */
-html:not(.scanner-mode) body{
-  margin:0 !important;
-  padding:0 !important;
-  min-height:100vh !important;
-  overflow:hidden !important;
-  background:
-    radial-gradient(circle at 12% 10%,rgba(37,99,235,.10),transparent 30%),
-    radial-gradient(circle at 88% 90%,rgba(14,165,233,.08),transparent 30%),
-    #f5f8fc !important;
+html.scanner-mode .container {
+  width: 100% !important;
+  max-width: 760px !important; /* Membatasi lebar di laptop/PC agar tidak melebar */
+  margin: 0 auto !important;
+  background: #ffffff !important;
+  border: 1px solid #e4eaf2 !important;
+  border-radius: 20px !important;
+  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.08) !important;
+  position: relative !important;
+  overflow: visible !important;
 }
 
-html:not(.scanner-mode) .container{
-  width:100% !important;
-  max-width:none !important;
-  min-height:100vh !important;
-  height:100vh !important;
-  margin:0 !important;
-  padding:0 !important;
-  border:0 !important;
-  border-radius:0 !important;
-  box-shadow:none !important;
-  background:transparent !important;
-  overflow:hidden !important;
+/* Areas */
+#scannerArea {
+  padding: 20px;
+  position: relative;
 }
 
-html:not(.scanner-mode) #loginArea{
-  width:100% !important;
-  height:100vh !important;
-  min-height:100vh !important;
-  margin:0 !important;
-  padding:24px !important;
-  display:flex !important;
-  flex-direction:column !important;
-  justify-content:center !important;
-  align-items:center !important;
-  overflow:hidden !important;
-  background:transparent !important;
+/* Kamera Scanner */
+#reader {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 380px !important;
+  margin: 12px auto !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  border: 4px solid #f1f5f9 !important;
 }
 
-/* Batasi konten login, bukan container luar */
-html:not(.scanner-mode) #loginArea > *{
-  width:min(420px,100%) !important;
-  max-width:420px !important;
-  flex-shrink:0 !important;
+#reader video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
 }
 
-html:not(.scanner-mode) #loginArea img,
-html:not(.scanner-mode) #loginArea .school-logo{
-  width:88px !important;
-  height:88px !important;
-  object-fit:contain !important;
-  display:block !important;
-  margin:0 auto 10px !important;
+/* Hamburger Menu Drawer Fix */
+.menu {
+  position: absolute !important;
+  top: 18px !important;
+  right: 18px !important;
+  z-index: 999 !important;
+  width: auto !important;
 }
 
-html:not(.scanner-mode) #loginArea h2{
-  margin:0 0 5px !important;
-  text-align:center !important;
-  font-size:24px !important;
-  line-height:1.2 !important;
+.menu-drawer {
+  position: absolute !important;
+  top: 50px !important;
+  right: 0 !important;
+  width: 260px !important;
+  max-width: calc(100vw - 32px) !important;
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 14px !important;
+  padding: 8px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
 }
 
-html:not(.scanner-mode) #loginArea p{
-  margin:3px 0 12px !important;
-  text-align:center !important;
-  font-size:13px !important;
+.menu-drawer button, 
+.menu-drawer .dashboard-harian-menu {
+  width: 100% !important;
+  margin: 4px 0 !important;
+  box-sizing: border-box !important;
 }
 
-html:not(.scanner-mode) #loginArea input{
-  width:100% !important;
-  height:52px !important;
-  margin:5px 0 !important;
-  font-size:16px !important;
-}
-
-html:not(.scanner-mode) #loginArea button{
-  width:100% !important;
-  height:52px !important;
-  margin:8px 0 0 !important;
-  font-size:16px !important;
-}
-
-html:not(.scanner-mode) #loginArea .hasil,
-html:not(.scanner-mode) #loginArea #hasil{
-  max-height:52px !important;
-  overflow:auto !important;
-}
-
-/* =========================
-   SCANNER — DESKTOP
-   ========================= */
-html.scanner-mode body{
-  margin:0 !important;
-  padding:16px !important;
-  min-height:100vh !important;
-  background:#f5f8fc !important;
-  overflow-x:hidden !important;
-}
-
-html.scanner-mode .container{
-  width:min(820px,100%) !important;
-  max-width:820px !important;
-  min-height:calc(100vh - 32px) !important;
-  margin:0 auto !important;
-  background:#fff !important;
-  border:1px solid #e3eaf3 !important;
-  border-radius:22px !important;
-  box-shadow:0 14px 45px rgba(15,23,42,.08) !important;
-  overflow:hidden !important;
-}
-
-html.scanner-mode #scannerArea{
-  width:100% !important;
-  padding:16px !important;
-}
-
-html.scanner-mode #reader{
-  width:100% !important;
-  max-width:none !important;
-  margin:8px auto !important;
-  overflow:hidden !important;
-  border-radius:18px !important;
-}
-
-html.scanner-mode #reader video{
-  width:100% !important;
-  height:auto !important;
-}
-
-/* Menu drawer */
-html.scanner-mode .menu{
-  width:100% !important;
-}
-
-html.scanner-mode .menu-toggle{
-  width:48px !important;
-  height:44px !important;
-  margin-left:auto !important;
-}
-
-html.scanner-mode .menu-drawer{
-  width:100% !important;
-}
-
-html.scanner-mode .menu-drawer button{
-  width:100% !important;
-  min-height:46px !important;
-}
-
-/* KELUAR selalu terlihat di menu */
-html.scanner-mode #menuDrawer .menu-exit-button{
-  display:block !important;
-  width:100% !important;
-  min-height:48px !important;
-  background:#fff1f2 !important;
-  color:#b91c1c !important;
-  border:1px solid #fecdd3 !important;
-}
-
-/* =========================
-   HP / TABLET
-   ========================= */
-@media (max-width:700px){
-
-  html:not(.scanner-mode) body{
-    min-height:100dvh !important;
-    height:100dvh !important;
+/* Responsive Mobile / Tablet */
+@media (max-width: 700px) {
+  html.scanner-mode body {
+    padding: 0 !important;
   }
 
-  html:not(.scanner-mode) .container{
-    min-height:100dvh !important;
-    height:100dvh !important;
+  html.scanner-mode .container {
+    max-width: 100% !important;
+    min-height: 100dvh !important;
+    border-radius: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
   }
 
-  html:not(.scanner-mode) #loginArea{
-    min-height:100dvh !important;
-    height:100dvh !important;
-    padding:
-      max(12px, env(safe-area-inset-top))
-      18px
-      max(12px, env(safe-area-inset-bottom))
-      18px !important;
+  #scannerArea {
+    padding: 12px !important;
   }
 
-  html:not(.scanner-mode) #loginArea > *{
-    width:min(390px,100%) !important;
-    max-width:390px !important;
-  }
-
-  html:not(.scanner-mode) #loginArea img,
-  html:not(.scanner-mode) #loginArea .school-logo{
-    width:74px !important;
-    height:74px !important;
-    margin-bottom:7px !important;
-  }
-
-  html:not(.scanner-mode) #loginArea h2{
-    font-size:20px !important;
-  }
-
-  html:not(.scanner-mode) #loginArea p{
-    font-size:12px !important;
-    margin-bottom:8px !important;
-  }
-
-  html:not(.scanner-mode) #loginArea input{
-    height:50px !important;
-    font-size:16px !important;
-  }
-
-  html:not(.scanner-mode) #loginArea button{
-    height:50px !important;
-    font-size:15px !important;
-  }
-
-  /* Scanner full-width on phone */
-  html.scanner-mode body{
-    padding:0 !important;
-    min-height:100dvh !important;
-    background:#f5f8fc !important;
-  }
-
-  html.scanner-mode .container{
-    width:100% !important;
-    max-width:none !important;
-    min-height:100dvh !important;
-    margin:0 !important;
-    border:0 !important;
-    border-radius:0 !important;
-    box-shadow:none !important;
-  }
-
-  html.scanner-mode #scannerArea{
-    padding:
-      max(8px, env(safe-area-inset-top))
-      10px
-      max(10px, env(safe-area-inset-bottom))
-      10px !important;
-  }
-
-  html.scanner-mode #reader{
-    width:100% !important;
-    min-height:0 !important;
-    margin:8px 0 !important;
-    border:4px solid #fff !important;
-    border-radius:16px !important;
-  }
-
-  html.scanner-mode #reader video{
-    width:100% !important;
-    min-height:0 !important;
-    max-height:none !important;
-    object-fit:cover !important;
-  }
-
-  html.scanner-mode .menu-toggle{
-    width:52px !important;
-    height:48px !important;
-    margin:0 0 8px auto !important;
-  }
-
-  html.scanner-mode .menu-drawer{
-    border-radius:15px !important;
-    padding:8px !important;
-  }
-
-  html.scanner-mode .menu-drawer button{
-    min-height:50px !important;
-    font-size:14px !important;
-  }
-
-  html.scanner-mode #menuDrawer .menu-exit-button{
-    min-height:50px !important;
-    font-size:15px !important;
-  }
-}
-
-/* HP layar pendek: padatkan login tanpa scroll */
-@media (max-width:700px) and (max-height:700px){
-
-  html:not(.scanner-mode) #loginArea{
-    padding:8px 16px !important;
-  }
-
-  html:not(.scanner-mode) #loginArea img,
-  html:not(.scanner-mode) #loginArea .school-logo{
-    width:60px !important;
-    height:60px !important;
-    margin-bottom:5px !important;
-  }
-
-  html:not(.scanner-mode) #loginArea h2{
-    font-size:18px !important;
-    margin-bottom:2px !important;
-  }
-
-  html:not(.scanner-mode) #loginArea p{
-    font-size:11px !important;
-    margin:2px 0 5px !important;
-  }
-
-  html:not(.scanner-mode) #loginArea input,
-  html:not(.scanner-mode) #loginArea button{
-    height:44px !important;
-  }
-}
-</style>
-
-
-<style id="MANUAL_MODE_LAYOUT_FIX">
-/* Absen manual mengambil alih tampilan scanner saat menu dipilih. */
-html.scanner-mode.manual-mode #scannerArea{
-  display:none !important;
-}
-
-html.scanner-mode.manual-mode #manualArea{
-  display:block !important;
-  width:100% !important;
-  min-height:calc(100dvh - 24px);
-}
-
-@media(max-width:700px){
-  html.scanner-mode.manual-mode #manualArea{
-    min-height:100dvh !important;
-    padding:14px !important;
-    overflow-x:hidden !important;
-  }
-
-  html.scanner-mode.manual-mode #manualArea input,
-  html.scanner-mode.manual-mode #manualArea textarea,
-  html.scanner-mode.manual-mode #manualArea button{
-    width:100% !important;
-    min-height:50px !important;
-    font-size:15px !important;
-    box-sizing:border-box !important;
-  }
-
-  html.scanner-mode.manual-mode #hasilPencarianManual{
-    width:100% !important;
-    overflow-x:hidden !important;
+  #reader {
+    height: 320px !important;
   }
 }
 </style>
