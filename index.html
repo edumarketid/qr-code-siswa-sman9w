@@ -37,7 +37,7 @@
           </div>
           <div class="flex items-center justify-end gap-1 mt-0.5">
             <span id="app-version-tag" class="text-[10px] font-mono text-emerald-300 bg-emerald-950/60 px-1.5 py-0.2 rounded-md border border-emerald-500/30">v2.30</span>
-            <span id="app-role-badge" onclick="showLoginModal()" class="text-[10px] font-bold text-amber-300 bg-amber-950/60 px-1.5 py-0.2 rounded-md border border-amber-500/30 cursor-pointer">PETUGAS</span>
+            <span id="app-role-badge" onclick="handleRoleBadgeClick()" class="text-[10px] font-bold text-amber-300 bg-amber-950/60 px-1.5 py-0.2 rounded-md border border-amber-500/30 cursor-pointer select-none">PETUGAS</span>
           </div>
         </div>
       </div>
@@ -421,7 +421,10 @@
     <div id="menu-modal" class="absolute inset-0 bg-black/60 backdrop-blur-sm z-50 flex flex-col justify-end hidden">
       <div class="bg-white rounded-t-3xl p-5 space-y-4 shadow-2xl">
         <div class="flex items-center justify-between border-b border-gray-100 pb-3">
-          <h3 class="font-bold text-gray-900 text-sm">Menu Utama Aplikasi</h3>
+          <div class="flex items-center space-x-2">
+            <h3 class="font-bold text-gray-900 text-sm">Menu Utama Aplikasi</h3>
+            <span id="menu-role-status-text" class="text-[9px] font-extrabold px-2 py-0.5 rounded-md bg-amber-100 text-amber-800">PETUGAS</span>
+          </div>
           <button onclick="toggleMenuModal()" class="w-7 h-7 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center"><i class="fa-solid fa-xmark text-sm"></i></button>
         </div>
         <div id="menu-grid-box" class="grid grid-cols-2 gap-3"></div>
@@ -541,11 +544,29 @@
     function showLoginModal() { document.getElementById("login-modal").classList.remove("hidden"); }
     function hideLoginModal() { document.getElementById("login-modal").classList.add("hidden"); }
 
+    function handleRoleBadgeClick() {
+      if (currentUserRole === "ADMIN") {
+        if (confirm("Keluar dari Mode Admin dan kembali menjadi Petugas?")) {
+          switchToPetugasRole();
+        }
+      } else {
+        showLoginModal();
+      }
+    }
+
+    function switchToPetugasRole() {
+      currentUserRole = "PETUGAS";
+      localStorage.setItem("USER_ROLE", "PETUGAS");
+      updateRoleUI();
+      alert("Kembali ke mode Petugas.");
+    }
+
     function processAdminLogin() {
       const pass = document.getElementById("admin-pass-input").value;
       if (pass === "123456") {
         currentUserRole = "ADMIN";
         localStorage.setItem("USER_ROLE", "ADMIN");
+        document.getElementById("admin-pass-input").value = "";
         updateRoleUI();
         hideLoginModal();
         alert("Login Admin Berhasil!");
@@ -556,18 +577,29 @@
 
     function updateRoleUI() {
       const badge = document.getElementById("app-role-badge");
+      const statusText = document.getElementById("menu-role-status-text");
+
       if (currentUserRole === "ADMIN") {
-        badge.innerText = "ADMIN";
-        badge.className = "text-[10px] font-bold text-emerald-300 bg-emerald-950/60 px-1.5 py-0.2 rounded-md border border-emerald-500/30 cursor-pointer";
+        badge.innerText = "ADMIN (LOGOUT)";
+        badge.className = "text-[10px] font-bold text-emerald-300 bg-emerald-950/60 px-1.5 py-0.2 rounded-md border border-emerald-500/30 cursor-pointer select-none";
+        if (statusText) {
+          statusText.innerText = "MODE ADMIN";
+          statusText.className = "text-[9px] font-extrabold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800";
+        }
       } else {
         badge.innerText = "PETUGAS";
-        badge.className = "text-[10px] font-bold text-amber-300 bg-amber-950/60 px-1.5 py-0.2 rounded-md border border-amber-500/30 cursor-pointer";
+        badge.className = "text-[10px] font-bold text-amber-300 bg-amber-950/60 px-1.5 py-0.2 rounded-md border border-amber-500/30 cursor-pointer select-none";
+        if (statusText) {
+          statusText.innerText = "MODE PETUGAS";
+          statusText.className = "text-[9px] font-extrabold px-2 py-0.5 rounded-md bg-amber-100 text-amber-800";
+        }
       }
       renderMenuModalGrid();
     }
 
     function renderMenuModalGrid() {
       const grid = document.getElementById("menu-grid-box");
+      if (!grid) return;
       const isAdmin = (currentUserRole === "ADMIN");
 
       const items = [
@@ -581,7 +613,7 @@
         { label: "Pengaturan", icon: "fa-gear", color: "purple", action: "toggleView('settings')", adminOnly: true }
       ];
 
-      grid.innerHTML = items.map(item => {
+      let htmlContent = items.map(item => {
         const isDisabled = item.adminOnly && !isAdmin;
         if (isDisabled) {
           return `
@@ -599,6 +631,17 @@
           `;
         }
       }).join('');
+
+      if (isAdmin) {
+        htmlContent += `
+          <button onclick="toggleMenuModal(); switchToPetugasRole();" class="p-3 bg-amber-50 border border-amber-200 rounded-2xl flex flex-col items-center justify-center gap-1.5 col-span-2 hover:bg-amber-100 transition">
+            <i class="fa-solid fa-right-from-bracket text-xl text-amber-700"></i>
+            <span class="text-xs font-bold text-amber-900">Kembali Ke Mode Petugas (Logout Admin)</span>
+          </button>
+        `;
+      }
+
+      grid.innerHTML = htmlContent;
     }
 
     function initDatabase() {
