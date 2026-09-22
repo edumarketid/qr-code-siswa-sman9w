@@ -112,11 +112,10 @@
         <div class="flex items-center justify-between mb-2">
           <div>
             <h2 class="font-bold text-lg text-gray-900">Data Master Siswa</h2>
-            <p class="text-xs text-gray-500">Kelola & Tambah Siswa Baru</p>
+            <p class="text-xs text-gray-500">Daftar & Pencarian Siswa Terdaftar</p>
           </div>
-          <div class="flex items-center space-x-1.5">
-            <button onclick="toggleAddStudentModal()" class="bg-emerald-600 text-white p-2.5 rounded-xl text-xs font-bold flex items-center gap-1 shadow-sm"><i class="fa-solid fa-plus"></i> Tambah</button>
-            <button onclick="autoDownloadMasterStudents()" class="bg-blue-50 text-blue-600 p-2.5 rounded-xl text-xs font-bold border border-blue-200"><i class="fa-solid fa-rotate"></i></button>
+          <div>
+            <button onclick="autoDownloadMasterStudents()" class="bg-blue-50 text-blue-600 px-3 py-2 rounded-xl text-xs font-bold border border-blue-200 flex items-center gap-1.5 shadow-sm"><i class="fa-solid fa-rotate"></i> Segarkan</button>
           </div>
         </div>
         <div class="grid grid-cols-2 gap-2 mb-2">
@@ -396,10 +395,22 @@
           <h3 class="font-bold text-gray-900 text-sm">Tambah Siswa Baru</h3>
           <button onclick="toggleAddStudentModal()" class="w-7 h-7 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center"><i class="fa-solid fa-xmark text-sm"></i></button>
         </div>
-        <input type="text" id="new-std-id" placeholder="ID Siswa (Unik)" class="w-full px-3 py-2 bg-slate-50 border border-gray-200 rounded-xl text-xs">
-        <input type="text" id="new-std-nisn" placeholder="NISN Siswa" class="w-full px-3 py-2 bg-slate-50 border border-gray-200 rounded-xl text-xs">
-        <input type="text" id="new-std-nama" placeholder="Nama Lengkap Siswa" class="w-full px-3 py-2 bg-slate-50 border border-gray-200 rounded-xl text-xs">
-        <input type="text" id="new-std-kelas" placeholder="Kelas" class="w-full px-3 py-2 bg-slate-50 border border-gray-200 rounded-xl text-xs">
+        <div>
+          <label class="block text-[10px] font-bold text-gray-600 mb-1">ID Siswa (Otomatis)</label>
+          <input type="text" id="new-std-id" placeholder="ID Siswa (Unik)" class="w-full px-3 py-2 bg-slate-100 border border-gray-200 rounded-xl text-xs font-bold text-blue-900">
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-gray-600 mb-1">NISN Siswa</label>
+          <input type="text" id="new-std-nisn" placeholder="NISN Siswa" class="w-full px-3 py-2 bg-slate-50 border border-gray-200 rounded-xl text-xs">
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-gray-600 mb-1">Nama Lengkap Siswa</label>
+          <input type="text" id="new-std-nama" placeholder="Nama Lengkap Siswa" class="w-full px-3 py-2 bg-slate-50 border border-gray-200 rounded-xl text-xs">
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-gray-600 mb-1">Kelas</label>
+          <input type="text" id="new-std-kelas" placeholder="Kelas" class="w-full px-3 py-2 bg-slate-50 border border-gray-200 rounded-xl text-xs">
+        </div>
         <button onclick="saveNewStudentToDB()" class="w-full bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs shadow-md"><i class="fa-solid fa-floppy-disk"></i> Simpan Siswa Baru</button>
       </div>
     </div>
@@ -603,10 +614,11 @@
       const isAdmin = (currentUserRole === "ADMIN");
 
       const items = [
+        { label: "Tambah Siswa", icon: "fa-user-plus", color: "emerald", action: "toggleAddStudentModal()", adminOnly: true },
         { label: "Absensi Manual", icon: "fa-keyboard", color: "blue", action: "promptManualInput()", adminOnly: false },
         { label: "Atur Hari Libur", icon: "fa-calendar-day", color: "amber", action: "toggleView('hari-libur')", adminOnly: true },
         { label: "Tindak Lanjut", icon: "fa-user-shield", color: "rose", action: "toggleView('tindak-lanjut')", adminOnly: true },
-        { label: "Pindah/Naik Kelas", icon: "fa-graduation-cap", color: "emerald", action: "toggleView('promotion')", adminOnly: true },
+        { label: "Pindah/Naik Kelas", icon: "fa-graduation-cap", color: "indigo", action: "toggleView('promotion')", adminOnly: true },
         { label: "Laporan Rekap", icon: "fa-file-invoice", color: "emerald", action: "bukaHalamanLaporan()", adminOnly: true },
         { label: "Cetak QR Code", icon: "fa-print", color: "indigo", action: "bukaHalamanCetakQR()", adminOnly: true },
         { label: "Tentang Aplikasi", icon: "fa-circle-info", color: "teal", action: "toggleView('about')", adminOnly: false },
@@ -1087,6 +1099,40 @@
       `).join('');
     }
 
+    function generateNextStudentId() {
+      if (!cachedStudents || cachedStudents.length === 0) {
+        return "S101";
+      }
+
+      let maxNum = 0;
+      let prefix = "S";
+
+      cachedStudents.forEach(s => {
+        if (s.id_siswa) {
+          const cleanId = String(s.id_siswa).trim();
+          const match = cleanId.match(/^([a-zA-Z]+)(\d+)$/);
+          if (match) {
+            prefix = match[1]; 
+            const num = parseInt(match[2], 10);
+            if (!isNaN(num) && num > maxNum) {
+              maxNum = num;
+            }
+          } else {
+            const numOnly = parseInt(cleanId.replace(/\D/g, ''), 10);
+            if (!isNaN(numOnly) && numOnly > maxNum) {
+              maxNum = numOnly;
+            }
+          }
+        }
+      });
+
+      if (maxNum === 0) {
+        return "S101";
+      }
+
+      return prefix + (maxNum + 1);
+    }
+
     function toggleView(viewName) {
       const views = ['scanner', 'success', 'students', 'monitoring', 'donation', 'about', 'tindak-lanjut', 'hari-libur', 'settings', 'promotion'];
       views.forEach(v => document.getElementById('view-' + v).classList.add('hidden'));
@@ -1104,7 +1150,20 @@
       renderMenuModalGrid();
       document.getElementById('menu-modal').classList.toggle('hidden'); 
     }
-    function toggleAddStudentModal() { document.getElementById('add-student-modal').classList.toggle('hidden'); }
+
+    function toggleAddStudentModal() { 
+      const modal = document.getElementById('add-student-modal');
+      const isHidden = modal.classList.contains('hidden');
+      
+      if (isHidden) {
+        const autoId = generateNextStudentId();
+        document.getElementById('new-std-id').value = autoId;
+        document.getElementById('new-std-nisn').value = "";
+        document.getElementById('new-std-nama').value = "";
+        document.getElementById('new-std-kelas').value = "";
+      }
+      modal.classList.toggle('hidden'); 
+    }
 
     function onMonitoringDateChange() {
       const targetDate = formatCleanDateLocal(document.getElementById('monitoring-date-filter').value) || new Date().toISOString().split('T')[0];
