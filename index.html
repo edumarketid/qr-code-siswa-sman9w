@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0b3c5d">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Sistem Absensi Murid - v2.36</title>
+  <title>Sistem Absensi Murid - v2.37</title>
   <link rel="manifest" href='data:application/manifest+json,{"name":"Sistem Absensi Murid","short_name":"AbsensiQR","start_url":"./index.html","display":"standalone","background_color":"#0b3c5d","theme_color":"#0b3c5d","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/3135/3135715.png","sizes":"512x512","type":"image/png"}]}'>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -37,7 +37,7 @@
             <span id="status-text" class="text-xs font-semibold">Memeriksa...</span>
           </div>
           <div class="flex items-center justify-end gap-1 mt-0.5">
-            <span id="app-version-tag" class="text-[10px] font-mono text-emerald-300 bg-emerald-950/60 px-1.5 py-0.2 rounded-md border border-emerald-500/30">v2.36</span>
+            <span id="app-version-tag" class="text-[10px] font-mono text-emerald-300 bg-emerald-950/60 px-1.5 py-0.2 rounded-md border border-emerald-500/30">v2.37</span>
             <span id="app-role-badge" onclick="handleRoleBadgeClick()" class="text-[10px] font-bold text-amber-300 bg-amber-950/60 px-1.5 py-0.2 rounded-md border border-amber-500/30 cursor-pointer select-none">PETUGAS</span>
           </div>
         </div>
@@ -213,7 +213,7 @@
         <div id="students-list-container" class="space-y-2 pb-4"></div>
       </main>
 
-      <!-- MONITORING REVISI -->
+      <!-- MONITORING -->
       <main id="view-monitoring" class="p-4 hidden">
         <div class="flex items-center justify-between mb-3">
           <div>
@@ -355,7 +355,7 @@
           <h3 class="font-bold text-xs text-blue-900 border-b border-gray-100 pb-1.5">APLIKASI</h3>
           <div class="flex justify-between text-xs">
             <span class="text-gray-500">Versi Aplikasi</span>
-            <span class="font-bold text-gray-900">v2.36</span>
+            <span class="font-bold text-gray-900">v2.37</span>
           </div>
           <div class="flex justify-between text-xs">
             <span class="text-gray-500">Status Update</span>
@@ -839,8 +839,13 @@
 
     function toggleTimeModeSetting() {
       if (!isManualTimeMode) {
-        const todayStr = new Date().toISOString().split('T')[0];
-        const nowTimeStr = padZeroTime(new Date().toTimeString().split(' ')[0].substring(0, 5));
+        const d = new Date();
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        const todayStr = `${year}-${month}-${day}`;
+        const nowTimeStr = padZeroTime(d.toTimeString().split(' ')[0].substring(0, 5));
+        
         const inputDate = prompt("Mode Manual: Tanggal Scan (YYYY-MM-DD):", todayStr);
         if (!inputDate || !inputDate.trim()) return;
         const inputTime = prompt("Mode Manual: Jam Scan (HH:MM):", nowTimeStr);
@@ -1051,7 +1056,13 @@
         return;
       }
       try {
-        const targetDateFilter = formatCleanDateLocal(targetDateStr) || document.getElementById('monitoring-date-filter').value || new Date().toISOString().split('T')[0];
+        const d = new Date();
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        const realTodayStr = `${year}-${month}-${day}`;
+
+        const targetDateFilter = formatCleanDateLocal(targetDateStr) || document.getElementById('monitoring-date-filter').value || realTodayStr;
         const response = await fetch(`${GAS_WEB_APP_URL}?action=GET_APP_DATA&tanggal=${targetDateFilter}`);
         const result = await response.json();
         if (result.success) {
@@ -1251,9 +1262,15 @@
       modal.classList.toggle('hidden'); 
     }
 
-    /* DASHBOARD UTAMA LOGIC (SINKRONISASI KARTU TERLAMBAT DENGAN MONITORING) */
+    /* DASHBOARD UTAMA LOGIC */
     async function renderDashboardView() {
-      const targetDate = formatCleanDateLocal(document.getElementById('dashboard-date-filter').value) || new Date().toISOString().split('T')[0];
+      const d = new Date();
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      const realTodayStr = `${year}-${month}-${day}`;
+
+      const targetDate = formatCleanDateLocal(document.getElementById('dashboard-date-filter').value) || realTodayStr;
       document.getElementById('dashboard-date-filter').value = targetDate;
       
       const queueRecords = await getAllQueueFromDB();
@@ -1267,12 +1284,10 @@
       cachedStudents.forEach(std => {
         const rec = rawRecords.find(r => String(r.id_siswa).trim().toUpperCase() === String(std.id_siswa).trim().toUpperCase());
         
-        // 1. Hitung Terlambat khusus dari Status Pagi (Sinkron dengan Monitoring Mode Pagi)
         if (rec && String(rec.status_pagi || "").toUpperCase() === "TERLAMBAT") {
           countTerlambat++;
         }
 
-        // 2. Hitung Status Lainnya dari Status Akhir
         if (!rec) {
           countAlpa++;
         } else {
@@ -1294,7 +1309,7 @@
       document.getElementById('dash-pct-sub').innerText = `${totalKehadiranVal} dari ${totalStd} Siswa Hadir`;
       
       document.getElementById('dash-count-hadir').innerText = countHadir;
-      document.getElementById('dash-count-terlambat').innerText = countTerlambat; // Sinkron dengan Monitoring Pagi
+      document.getElementById('dash-count-terlambat').innerText = countTerlambat;
       document.getElementById('dash-count-alpa').innerText = countAlpa;
       document.getElementById('dash-count-bolos').innerText = countBolos;
       document.getElementById('dash-count-izinsakit').innerText = countIzin + countSakit;
@@ -1337,7 +1352,9 @@
     }
 
     async function renderDashboardStudentTable() {
-      const targetDate = formatCleanDateLocal(document.getElementById('dashboard-date-filter').value) || new Date().toISOString().split('T')[0];
+      const d = new Date();
+      const realTodayStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const targetDate = formatCleanDateLocal(document.getElementById('dashboard-date-filter').value) || realTodayStr;
       const selectedClass = document.getElementById('dash-filter-class').value;
       const selectedStatus = document.getElementById('dash-filter-status').value;
       const searchQ = document.getElementById('dash-search-student').value.toLowerCase();
@@ -1396,7 +1413,9 @@
       document.getElementById('modal-std-name').innerText = std.nama;
       document.getElementById('modal-std-sub').innerText = `Kelas: ${std.kelas} | ID: ${std.id_siswa} | NISN: ${std.nisn || '-'}`;
 
-      const targetDate = formatCleanDateLocal(document.getElementById('dashboard-date-filter').value) || new Date().toISOString().split('T')[0];
+      const d = new Date();
+      const realTodayStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const targetDate = formatCleanDateLocal(document.getElementById('dashboard-date-filter').value) || realTodayStr;
       const rec = [...fetchedTodayAttendance, ...fetchedAttendanceHistory].find(r => String(r.id_siswa).trim().toUpperCase() === String(idSiswa).trim().toUpperCase() && formatCleanDateLocal(r.tanggal) === targetDate);
 
       const contentEl = document.getElementById('modal-std-status-content');
@@ -1419,14 +1438,18 @@
     }
 
     function onMonitoringDateChange() {
-      const targetDate = formatCleanDateLocal(document.getElementById('monitoring-date-filter').value) || new Date().toISOString().split('T')[0];
+      const d = new Date();
+      const realTodayStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const targetDate = formatCleanDateLocal(document.getElementById('monitoring-date-filter').value) || realTodayStr;
       updateMonitoringDashboard();
       if (navigator.onLine) autoDownloadMasterStudents(targetDate);
     }
 
     /* MONITORING LOGIC */
     async function updateMonitoringDashboard() {
-      const targetDate = formatCleanDateLocal(document.getElementById('monitoring-date-filter').value) || new Date().toISOString().split('T')[0];
+      const d = new Date();
+      const realTodayStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const targetDate = formatCleanDateLocal(document.getElementById('monitoring-date-filter').value) || realTodayStr;
       const selectedClass = document.getElementById('monitoring-class-filter').value;
       const selectedSessionFilter = document.getElementById('monitoring-session-filter').value;
       const selectedStatusFilter = document.getElementById('monitoring-status-filter').value || "ALL";
@@ -1443,7 +1466,7 @@
       const dateObj = new Date(targetDate + "T00:00:00");
       const timeConfig = getTodayTimeConfig(dateObj);
       const now = new Date();
-      const todayFormatted = now.toISOString().split('T')[0];
+      const todayFormatted = realTodayStr;
       const nowStr = padZeroTime(now.toTimeString().split(' ')[0]);
       
       const isPastLimit = (selectedSessionFilter === "PAGI") ? 
@@ -1865,7 +1888,10 @@
       isProcessingScan = true;
 
       let nowDateObj = new Date();
-      let dateStr = nowDateObj.toISOString().split('T')[0];
+      const year = nowDateObj.getFullYear();
+      const month = String(nowDateObj.getMonth() + 1).padStart(2, '0');
+      const day = String(nowDateObj.getDate()).padStart(2, '0');
+      let dateStr = `${year}-${month}-${day}`;
       let timeStr = padZeroTime(nowDateObj.toTimeString().split(' ')[0].substring(0, 5));
 
       if (isManualTimeMode && customScanDateOverride && customScanTimeOverride) {
@@ -2046,16 +2072,22 @@
         document.getElementById("input-school-name").value = localSchoolName;
         document.getElementById("input-academic-year").value = localAcadYear;
       }
-      const todayStr = new Date().toISOString().split('T')[0];
-      document.getElementById("monitoring-date-filter").value = todayStr;
-      document.getElementById("dashboard-date-filter").value = todayStr;
+      
+      const d = new Date();
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      const todayRealStr = `${year}-${month}-${day}`;
+
+      document.getElementById("monitoring-date-filter").value = todayRealStr;
+      document.getElementById("dashboard-date-filter").value = todayRealStr;
 
       await initDatabase();
       await loadStudentsView();
       renderDaysConfigForm();
       
       if (navigator.onLine) {
-        autoDownloadMasterStudents();
+        autoDownloadMasterStudents(todayRealStr);
       } else {
         loadLocalHistoryToMemory();
       }
