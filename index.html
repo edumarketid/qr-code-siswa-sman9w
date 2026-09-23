@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0b3c5d">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Sistem Absensi Murid - v2.32</title>
+  <title>Sistem Absensi Murid - v2.36</title>
   <link rel="manifest" href='data:application/manifest+json,{"name":"Sistem Absensi Murid","short_name":"AbsensiQR","start_url":"./index.html","display":"standalone","background_color":"#0b3c5d","theme_color":"#0b3c5d","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/3135/3135715.png","sizes":"512x512","type":"image/png"}]}'>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -37,7 +37,7 @@
             <span id="status-text" class="text-xs font-semibold">Memeriksa...</span>
           </div>
           <div class="flex items-center justify-end gap-1 mt-0.5">
-            <span id="app-version-tag" class="text-[10px] font-mono text-emerald-300 bg-emerald-950/60 px-1.5 py-0.2 rounded-md border border-emerald-500/30">v2.32</span>
+            <span id="app-version-tag" class="text-[10px] font-mono text-emerald-300 bg-emerald-950/60 px-1.5 py-0.2 rounded-md border border-emerald-500/30">v2.36</span>
             <span id="app-role-badge" onclick="handleRoleBadgeClick()" class="text-[10px] font-bold text-amber-300 bg-amber-950/60 px-1.5 py-0.2 rounded-md border border-amber-500/30 cursor-pointer select-none">PETUGAS</span>
           </div>
         </div>
@@ -108,7 +108,7 @@
         </button>
       </main>
 
-      <!-- DASHBOARD BARU -->
+      <!-- DASHBOARD UTAMA -->
       <main id="view-dashboard" class="p-4 space-y-3.5 hidden pb-8">
         <div class="flex items-center justify-between">
           <div>
@@ -118,39 +118,46 @@
           <input type="date" id="dashboard-date-filter" onchange="renderDashboardView()" class="px-2 py-1 bg-white border border-gray-200 rounded-xl text-xs font-bold text-blue-900 shadow-sm">
         </div>
 
-        <!-- KPI SUMMARY -->
-        <div class="grid grid-cols-2 gap-2">
-          <div class="bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-3 rounded-2xl shadow-sm">
-            <span class="block text-[10px] font-medium opacity-80">Tingkat Kehadiran</span>
-            <span id="dash-pct-total" class="text-2xl font-black">0%</span>
-            <span id="dash-pct-sub" class="block text-[9px] opacity-80 mt-1">0 dari 0 Siswa</span>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <div class="bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-3.5 rounded-2xl shadow-sm flex flex-col justify-center">
+            <span class="block text-[10px] font-medium opacity-80">Tingkat Kehadiran (Status Akhir)</span>
+            <span id="dash-pct-total" class="text-3xl font-black mt-1">0%</span>
+            <span id="dash-pct-sub" class="block text-[10px] opacity-80 mt-1">0 dari 0 Siswa</span>
           </div>
-          <div class="bg-white border border-gray-200 p-3 rounded-2xl shadow-sm grid grid-cols-2 gap-1 text-center">
-            <div class="bg-emerald-50 rounded-lg p-1"><span class="block text-[8px] font-bold text-emerald-700">HADIR</span><span id="dash-count-hadir" class="text-sm font-black text-emerald-800">0</span></div>
-            <div class="bg-amber-50 rounded-lg p-1"><span class="block text-[8px] font-bold text-amber-700">TERLAMBAT</span><span id="dash-count-terlambat" class="text-sm font-black text-amber-800">0</span></div>
-            <div class="bg-rose-50 rounded-lg p-1"><span class="block text-[8px] font-bold text-rose-700">ALPA</span><span id="dash-count-alpa" class="text-sm font-black text-rose-800">0</span></div>
-            <div class="bg-indigo-50 rounded-lg p-1"><span class="block text-[8px] font-bold text-indigo-700">IZIN/SAKIT</span><span id="dash-count-izinsakit" class="text-sm font-black text-indigo-800">0</span></div>
+
+          <div class="sm:col-span-2 bg-white border border-gray-200 p-3 rounded-2xl shadow-sm grid grid-cols-3 gap-1.5 text-center">
+            <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-2">
+              <span class="block text-[9px] font-extrabold text-emerald-700">HADIR</span>
+              <span id="dash-count-hadir" class="text-base font-black text-emerald-800">0</span>
+            </div>
+            <div class="bg-amber-50 border border-amber-100 rounded-xl p-2">
+              <span class="block text-[9px] font-extrabold text-amber-700">TERLAMBAT</span>
+              <span id="dash-count-terlambat" class="text-base font-black text-amber-800">0</span>
+            </div>
+            <div class="bg-red-50 border border-red-100 rounded-xl p-2">
+              <span class="block text-[9px] font-extrabold text-red-700">ALPA</span>
+              <span id="dash-count-alpa" class="text-base font-black text-red-800">0</span>
+            </div>
+            <div class="bg-rose-50 border border-rose-100 rounded-xl p-2">
+              <span class="block text-[9px] font-extrabold text-rose-700">BOLOS</span>
+              <span id="dash-count-bolos" class="text-base font-black text-rose-800">0</span>
+            </div>
+            <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-2">
+              <span class="block text-[9px] font-extrabold text-indigo-700">IZIN/SAKIT</span>
+              <span id="dash-count-izinsakit" class="text-base font-black text-indigo-800">0</span>
+            </div>
+            <div class="bg-purple-50 border border-purple-100 rounded-xl p-2">
+              <span class="block text-[9px] font-extrabold text-purple-700">KEGIATAN</span>
+              <span id="dash-count-kegiatan" class="text-base font-black text-purple-800">0</span>
+            </div>
           </div>
         </div>
 
-        <!-- GRAFIK PIE & REKAP KELAS -->
-        <div class="bg-white p-3.5 rounded-2xl border border-gray-200 shadow-sm space-y-3">
-          <h3 class="font-bold text-xs text-gray-800 border-b border-gray-100 pb-1.5 flex items-center justify-between">
-            <span>Proporsi Presensi Harian</span>
-            <i class="fa-solid fa-chart-pie text-blue-600"></i>
-          </h3>
-          <div class="w-36 h-36 mx-auto relative flex items-center justify-center">
-            <canvas id="dashboardPieChart"></canvas>
-          </div>
-        </div>
-
-        <!-- REKAP PER KELAS RINGKAS -->
         <div class="bg-white p-3.5 rounded-2xl border border-gray-200 shadow-sm space-y-2">
           <h3 class="font-bold text-xs text-gray-800 border-b border-gray-100 pb-1.5"><i class="fa-solid fa-school text-indigo-600"></i> Ringkasan Per Kelas</h3>
           <div id="dashboard-class-summary" class="space-y-1.5 max-h-48 overflow-y-auto no-scrollbar pr-0.5"></div>
         </div>
 
-        <!-- FILTER TABEL STATUS SISWA -->
         <div class="bg-white p-3.5 rounded-2xl border border-gray-200 shadow-sm space-y-2.5">
           <h3 class="font-bold text-xs text-gray-800 border-b border-gray-100 pb-1.5"><i class="fa-solid fa-filter text-emerald-600"></i> Daftar Siswa Berdasarkan Status</h3>
           <div class="grid grid-cols-2 gap-2">
@@ -164,6 +171,7 @@
               <option value="ALPA">Alpa</option>
               <option value="IZIN">Izin</option>
               <option value="SAKIT">Sakit</option>
+              <option value="KEGIATAN">Kegiatan</option>
               <option value="BOLOS">Bolos</option>
             </select>
           </div>
@@ -205,7 +213,7 @@
         <div id="students-list-container" class="space-y-2 pb-4"></div>
       </main>
 
-      <!-- MONITORING -->
+      <!-- MONITORING REVISI -->
       <main id="view-monitoring" class="p-4 hidden">
         <div class="flex items-center justify-between mb-3">
           <div>
@@ -214,7 +222,7 @@
           </div>
         </div>
         <div class="bg-white p-3 rounded-2xl border border-gray-200 shadow-sm space-y-2 mb-3">
-          <div class="grid grid-cols-3 gap-1.5">
+          <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="block text-[9px] font-bold text-gray-600 mb-1">Tanggal</label>
               <input type="date" id="monitoring-date-filter" onchange="onMonitoringDateChange()" class="w-full py-1.5 px-1.5 bg-slate-50 border border-gray-200 rounded-xl text-[11px] font-bold text-blue-900">
@@ -224,11 +232,23 @@
               <select id="monitoring-class-filter" onchange="updateMonitoringDashboard()" class="w-full py-1.5 px-1.5 bg-slate-50 border border-gray-200 rounded-xl text-[11px] font-bold text-blue-900"><option value="ALL">Semua</option></select>
             </div>
             <div>
-              <label class="block text-[9px] font-bold text-gray-600 mb-1">Mode Sesi</label>
-              <select id="monitoring-session-filter" onchange="updateMonitoringDashboard()" class="w-full py-1.5 px-1.5 bg-slate-50 border border-gray-200 rounded-xl text-[11px] font-bold text-blue-900">
-                <option value="ALL">Semua Sesi</option>
+              <label class="block text-[9px] font-bold text-gray-600 mb-1">Filter Mode Sesi</label>
+              <select id="monitoring-session-filter" onchange="updateMonitoringDashboard()" class="w-full py-1.5 px-2 bg-slate-50 border border-gray-200 rounded-xl text-[11px] font-bold text-blue-900">
                 <option value="PAGI">Mode Pagi</option>
                 <option value="SIANG">Mode Siang</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[9px] font-bold text-gray-600 mb-1">Filter Status</label>
+              <select id="monitoring-status-filter" onchange="updateMonitoringDashboard()" class="w-full py-1.5 px-2 bg-slate-50 border border-gray-200 rounded-xl text-[11px] font-bold text-blue-900">
+                <option value="ALL">Semua Status</option>
+                <option value="BELUM">Belum Absen</option>
+                <option value="HADIR">Hadir</option>
+                <option value="TERLAMBAT">Terlambat</option>
+                <option value="ALPA">Alpa</option>
+                <option value="IZIN">Izin</option>
+                <option value="SAKIT">Sakit</option>
+                <option value="KEGIATAN">Kegiatan</option>
               </select>
             </div>
           </div>
@@ -252,19 +272,19 @@
             <canvas id="classBarChart"></canvas>
           </div>
         </div>
-        <div class="grid grid-cols-4 gap-1.5 mb-3">
+
+        <div class="grid grid-cols-3 gap-1.5 mb-3">
           <div class="bg-emerald-50 border border-emerald-100 p-2 rounded-xl text-center"><span class="block text-[9px] text-emerald-600 font-bold">Hadir</span><span id="stat-hadir" class="text-xs font-extrabold text-emerald-800">0</span></div>
           <div class="bg-amber-50 border border-amber-100 p-2 rounded-xl text-center"><span class="block text-[9px] text-amber-600 font-bold">Terlambat</span><span id="stat-terlambat" class="text-xs font-extrabold text-amber-800">0</span></div>
           <div class="bg-red-50 border border-red-100 p-2 rounded-xl text-center"><span class="block text-[9px] text-red-600 font-bold">Alpa</span><span id="stat-alpa" class="text-xs font-extrabold text-red-800">0</span></div>
-          <div class="bg-rose-50 border border-rose-100 p-2 rounded-xl text-center"><span class="block text-[9px] text-rose-600 font-bold">Bolos</span><span id="stat-bolos" class="text-xs font-extrabold text-rose-800">0</span></div>
           <div class="bg-blue-50 border border-blue-100 p-2 rounded-xl text-center"><span class="block text-[9px] text-blue-600 font-bold">Sakit</span><span id="stat-sakit" class="text-xs font-extrabold text-blue-800">0</span></div>
           <div class="bg-indigo-50 border border-indigo-100 p-2 rounded-xl text-center"><span class="block text-[9px] text-indigo-600 font-bold">Izin</span><span id="stat-izin" class="text-xs font-extrabold text-indigo-800">0</span></div>
-          <div class="bg-purple-50 border border-purple-100 p-2 rounded-xl text-center col-span-2"><span class="block text-[9px] text-purple-600 font-bold">Kegiatan</span><span id="stat-kegiatan" class="text-xs font-extrabold text-purple-800">0</span></div>
+          <div class="bg-purple-50 border border-purple-100 p-2 rounded-xl text-center"><span class="block text-[9px] text-purple-600 font-bold">Kegiatan</span><span id="stat-kegiatan" class="text-xs font-extrabold text-purple-800">0</span></div>
         </div>
         <div class="bg-white p-3 rounded-2xl border border-gray-200 shadow-sm mb-4">
           <h3 class="font-bold text-xs text-gray-800 mb-2 border-b border-gray-100 pb-1.5 flex items-center justify-between">
-            <span id="monitoring-action-header-title">Siswa Belum Absen & Aksi Presensi</span>
-            <span id="monitoring-count-badge" class="text-[10px] text-rose-600 font-bold bg-rose-50 px-2 py-0.5 rounded-md">0 Siswa Belum</span>
+            <span id="monitoring-action-header-title">Daftar Siswa & Aksi Presensi</span>
+            <span id="monitoring-count-badge" class="text-[10px] text-rose-600 font-bold bg-rose-50 px-2 py-0.5 rounded-md">0 Siswa</span>
           </h3>
           <div id="monitoring-student-action-list" class="space-y-2.5 max-h-[380px] overflow-y-auto no-scrollbar pr-1"></div>
         </div>
@@ -292,7 +312,7 @@
         </div>
       </main>
 
-      <!-- DONASI (SEKARANG DIPINDAH KE MODAL MENU UTAMA) -->
+      <!-- DONASI -->
       <main id="view-donation" class="p-4 hidden">
         <div class="text-center mb-3">
           <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-2 text-xl shadow-sm"><i class="fa-solid fa-hand-holding-heart"></i></div>
@@ -335,7 +355,7 @@
           <h3 class="font-bold text-xs text-blue-900 border-b border-gray-100 pb-1.5">APLIKASI</h3>
           <div class="flex justify-between text-xs">
             <span class="text-gray-500">Versi Aplikasi</span>
-            <span class="font-bold text-gray-900">v2.32</span>
+            <span class="font-bold text-gray-900">v2.36</span>
           </div>
           <div class="flex justify-between text-xs">
             <span class="text-gray-500">Status Update</span>
@@ -573,7 +593,7 @@
 
     let html5QrCode = null, isCameraActive = false, db = null, cachedStudents = [];
     let fetchedTodayAttendance = [], fetchedAttendanceHistory = [], fetchedTindakLanjutHistory = [], fetchedHariLiburList = [];
-    let currentScanSession = "PAGI", myPieChart = null, myBarChart = null, dashboardPieChart = null;
+    let currentScanSession = "PAGI", myPieChart = null, myBarChart = null;
     let isManualTimeMode = false;
     let customScanDateOverride = null;
     let customScanTimeOverride = null;
@@ -1231,7 +1251,7 @@
       modal.classList.toggle('hidden'); 
     }
 
-    /* FITUR APLIKASI DASHBOARD */
+    /* DASHBOARD UTAMA LOGIC (SINKRONISASI KARTU TERLAMBAT DENGAN MONITORING) */
     async function renderDashboardView() {
       const targetDate = formatCleanDateLocal(document.getElementById('dashboard-date-filter').value) || new Date().toISOString().split('T')[0];
       document.getElementById('dashboard-date-filter').value = targetDate;
@@ -1242,19 +1262,26 @@
       const rawRecords = [...fetchedTodayAttendance, ...fetchedAttendanceHistory, ...localHist, ...queueRecords].filter(r => formatCleanDateLocal(r.tanggal) === targetDate);
 
       let totalStd = cachedStudents.length;
-      let countHadir = 0, countTerlambat = 0, countAlpa = 0, countIzin = 0, countSakit = 0, countBolos = 0;
+      let countHadir = 0, countTerlambat = 0, countAlpa = 0, countIzin = 0, countSakit = 0, countKegiatan = 0, countBolos = 0;
 
       cachedStudents.forEach(std => {
         const rec = rawRecords.find(r => String(r.id_siswa).trim().toUpperCase() === String(std.id_siswa).trim().toUpperCase());
+        
+        // 1. Hitung Terlambat khusus dari Status Pagi (Sinkron dengan Monitoring Mode Pagi)
+        if (rec && String(rec.status_pagi || "").toUpperCase() === "TERLAMBAT") {
+          countTerlambat++;
+        }
+
+        // 2. Hitung Status Lainnya dari Status Akhir
         if (!rec) {
           countAlpa++;
         } else {
           const st = String(rec.status_akhir || rec.status_presensi || "HADIR").toUpperCase();
           if (st === "HADIR") countHadir++;
-          else if (st === "TERLAMBAT") countTerlambat++;
           else if (st === "ALPA") countAlpa++;
           else if (st === "IZIN") countIzin++;
           else if (st === "SAKIT") countSakit++;
+          else if (st === "KEGIATAN") countKegiatan++;
           else if (st === "BOLOS") countBolos++;
           else countHadir++;
         }
@@ -1265,36 +1292,16 @@
 
       document.getElementById('dash-pct-total').innerText = `${pctHadir}%`;
       document.getElementById('dash-pct-sub').innerText = `${totalKehadiranVal} dari ${totalStd} Siswa Hadir`;
+      
       document.getElementById('dash-count-hadir').innerText = countHadir;
-      document.getElementById('dash-count-terlambat').innerText = countTerlambat;
+      document.getElementById('dash-count-terlambat').innerText = countTerlambat; // Sinkron dengan Monitoring Pagi
       document.getElementById('dash-count-alpa').innerText = countAlpa;
+      document.getElementById('dash-count-bolos').innerText = countBolos;
       document.getElementById('dash-count-izinsakit').innerText = countIzin + countSakit;
+      document.getElementById('dash-count-kegiatan').innerText = countKegiatan;
 
-      renderDashboardPieChart(countHadir, countTerlambat, countAlpa, countIzin + countSakit, countBolos);
       renderDashboardClassSummary(rawRecords);
       renderDashboardStudentTable();
-    }
-
-    function renderDashboardPieChart(hadir, terlambat, alpa, izinsakit, bolos) {
-      const ctx = document.getElementById('dashboardPieChart').getContext('2d');
-      if (dashboardPieChart) dashboardPieChart.destroy();
-
-      dashboardPieChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: ['Hadir', 'Terlambat', 'Alpa', 'Izin/Sakit', 'Bolos'],
-          datasets: [{
-            data: [hadir, terlambat, alpa, izinsakit, bolos],
-            backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#6366f1', '#f43f5e']
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          cutout: '65%',
-          plugins: { legend: { display: false } }
-        }
-      });
     }
 
     function renderDashboardClassSummary(rawRecords) {
@@ -1365,8 +1372,10 @@
         let badgeStyle = "bg-gray-100 text-gray-700";
         if (status === "HADIR") badgeStyle = "bg-emerald-100 text-emerald-800";
         else if (status === "TERLAMBAT") badgeStyle = "bg-amber-100 text-amber-800";
-        else if (status === "ALPA") badgeStyle = "bg-rose-100 text-rose-800";
+        else if (status === "ALPA") badgeStyle = "bg-red-100 text-red-800";
+        else if (status === "BOLOS") badgeStyle = "bg-rose-100 text-rose-800";
         else if (status === "IZIN" || status === "SAKIT") badgeStyle = "bg-indigo-100 text-indigo-800";
+        else if (status === "KEGIATAN") badgeStyle = "bg-purple-100 text-purple-800";
 
         return `
           <div onclick="showStudentDetailModal('${std.id_siswa}')" class="p-2.5 bg-slate-50 border border-gray-100 rounded-xl flex items-center justify-between cursor-pointer hover:bg-slate-100 transition">
@@ -1395,7 +1404,8 @@
         contentEl.innerHTML = `
           <p>Tanggal: <b>${rec.tanggal}</b></p>
           <p>Jam Scan: <b>${rec.jam || rec.jam_pagi || '-'}</b></p>
-          <p>Status Presensi: <b class="text-blue-700">${rec.status_akhir || rec.status_presensi || 'HADIR'}</b></p>
+          <p>Status Pagi: <b>${rec.status_pagi || '-'}</b> | Status Siang: <b>${rec.status_siang || '-'}</b></p>
+          <p>Status Akhir Presensi: <b class="text-blue-700">${rec.status_akhir || rec.status_presensi || 'HADIR'}</b></p>
         `;
       } else {
         contentEl.innerHTML = `<p class="text-rose-600 font-bold">Belum Melakukan Absensi / Tanpa Keterangan (Alpa)</p>`;
@@ -1414,74 +1424,87 @@
       if (navigator.onLine) autoDownloadMasterStudents(targetDate);
     }
 
+    /* MONITORING LOGIC */
     async function updateMonitoringDashboard() {
       const targetDate = formatCleanDateLocal(document.getElementById('monitoring-date-filter').value) || new Date().toISOString().split('T')[0];
       const selectedClass = document.getElementById('monitoring-class-filter').value;
       const selectedSessionFilter = document.getElementById('monitoring-session-filter').value;
+      const selectedStatusFilter = document.getElementById('monitoring-status-filter').value || "ALL";
       
       const queueRecords = await getAllQueueFromDB();
       const localHist = await getAllLocalHistoryFromDB();
       
       let rawRecords = [...fetchedTodayAttendance, ...fetchedAttendanceHistory, ...localHist, ...queueRecords].filter(r => formatCleanDateLocal(r.tanggal) === targetDate);
-      
-      if (selectedSessionFilter !== "ALL") {
-        rawRecords = rawRecords.filter(r => String(r.sesi || "PAGI").toUpperCase() === selectedSessionFilter);
-      }
 
       const classStudents = cachedStudents.filter(s => selectedClass === "ALL" || s.kelas === selectedClass);
-      let hadir = 0, terlambat = 0, alpa = 0, bolos = 0, sakit = 0, izin = 0, kegiatan = 0;
-      const unabsentedStudents = [];
+      let hadir = 0, terlambat = 0, alpa = 0, sakit = 0, izin = 0, kegiatan = 0;
+      const filteredActionStudents = [];
 
       const dateObj = new Date(targetDate + "T00:00:00");
       const timeConfig = getTodayTimeConfig(dateObj);
       const now = new Date();
       const todayFormatted = now.toISOString().split('T')[0];
       const nowStr = padZeroTime(now.toTimeString().split(' ')[0]);
-      const siangLimitWithSec = timeConfig.sLimit + ":01";
       
-      const isPastSiangLimit = (targetDate < todayFormatted) || 
-                               (targetDate === todayFormatted && nowStr >= siangLimitWithSec);
+      const isPastLimit = (selectedSessionFilter === "PAGI") ? 
+        ((targetDate < todayFormatted) || (targetDate === todayFormatted && nowStr >= (timeConfig.pLimit + ":01"))) :
+        ((targetDate < todayFormatted) || (targetDate === todayFormatted && nowStr >= (timeConfig.sLimit + ":01")));
 
       classStudents.forEach(std => {
         const stdRec = rawRecords.find(r => String(r.id_siswa).trim().toUpperCase() === String(std.id_siswa).trim().toUpperCase());
         
-        if (!stdRec) {
-          if (isPastSiangLimit) alpa++;
-          unabsentedStudents.push(std);
-        } else {
-          const jamPagi = stdRec.jam_pagi || (stdRec.sesi === "PAGI" ? stdRec.jam : "");
-          const jamSiang = stdRec.jam_siang || (stdRec.sesi === "SIANG" ? stdRec.jam : "");
-          const stAkhir = String(stdRec.status_akhir || stdRec.status_presensi || "HADIR").toUpperCase();
-
-          if (stAkhir === "ALPA") {
-            alpa++;
-            unabsentedStudents.push(std);
-          } else if (stAkhir === "BOLOS") bolos++;
-          else if (stAkhir === "IZIN") izin++;
-          else if (stAkhir === "SAKIT") sakit++;
-          else if (stAkhir === "KEGIATAN") kegiatan++;
-          else if (stAkhir === "TERLAMBAT" || stdRec.status_pagi === "TERLAMBAT" || stdRec.status_siang === "TERLAMBAT") terlambat++;
-          else if (stAkhir === "HADIR") {
-            if (jamPagi && !jamSiang && isPastSiangLimit) bolos++;
-            else hadir++;
+        var targetStatus = "";
+        if (stdRec) {
+          if (selectedSessionFilter === "PAGI") {
+            targetStatus = String(stdRec.status_pagi || "").toUpperCase();
+          } else if (selectedSessionFilter === "SIANG") {
+            targetStatus = String(stdRec.status_siang || "").toUpperCase();
           }
+        }
+
+        let evalStatus = targetStatus;
+        if (!targetStatus || targetStatus === "") {
+          evalStatus = isPastLimit ? "ALPA" : "BELUM";
+        }
+
+        if (evalStatus === "HADIR") hadir++;
+        else if (evalStatus === "TERLAMBAT") terlambat++;
+        else if (evalStatus === "ALPA") alpa++;
+        else if (evalStatus === "SAKIT") sakit++;
+        else if (evalStatus === "IZIN") izin++;
+        else if (evalStatus === "KEGIATAN") kegiatan++;
+
+        let matchStatus = false;
+        if (selectedStatusFilter === "ALL") {
+          matchStatus = true;
+        } else if (selectedStatusFilter === "BELUM") {
+          matchStatus = (!targetStatus || targetStatus === "");
+        } else {
+          matchStatus = (evalStatus === selectedStatusFilter);
+        }
+
+        if (matchStatus) {
+          filteredActionStudents.push({
+            student: std,
+            status: targetStatus || (isPastLimit ? "ALPA" : "BELUM"),
+            isAbsented: !!targetStatus
+          });
         }
       });
 
       document.getElementById('stat-hadir').innerText = hadir;
       document.getElementById('stat-terlambat').innerText = terlambat;
       document.getElementById('stat-alpa').innerText = alpa;
-      document.getElementById('stat-bolos').innerText = bolos;
       document.getElementById('stat-sakit').innerText = sakit;
       document.getElementById('stat-izin').innerText = izin;
       document.getElementById('stat-kegiatan').innerText = kegiatan;
 
-      renderPieChart(hadir, terlambat, alpa, bolos, sakit, izin, kegiatan, classStudents.length);
-      renderClassBarChartHorizontal(rawRecords);
-      renderMonitoringActionListOnlyUnabsented(targetDate, unabsentedStudents, isPastSiangLimit);
+      renderPieChart(hadir, terlambat, alpa, sakit, izin, kegiatan, classStudents.length);
+      renderClassBarChartHorizontal(rawRecords, selectedSessionFilter);
+      renderMonitoringActionListFiltered(targetDate, filteredActionStudents, isPastLimit, selectedSessionFilter, selectedStatusFilter);
     }
 
-    function renderClassBarChartHorizontal(attendanceRecords) {
+    function renderClassBarChartHorizontal(attendanceRecords, selectedSessionFilter) {
       const container = document.getElementById('classBarChartContainer');
       const ctx = document.getElementById('classBarChart').getContext('2d');
       if (myBarChart) myBarChart.destroy();
@@ -1496,7 +1519,10 @@
         studentsInCls.forEach(std => {
           const stdRec = attendanceRecords.find(r => String(r.id_siswa).trim().toUpperCase() === String(std.id_siswa).trim().toUpperCase());
           if (stdRec) {
-            const st = String(stdRec.status_akhir || stdRec.status_presensi || "HADIR").toUpperCase();
+            var st = "";
+            if (selectedSessionFilter === "PAGI") st = String(stdRec.status_pagi || "").toUpperCase();
+            else if (selectedSessionFilter === "SIANG") st = String(stdRec.status_siang || "").toUpperCase();
+            
             if (st === "HADIR" || st === "TERLAMBAT") countHadirVal++;
           }
         });
@@ -1541,27 +1567,34 @@
       });
     }
 
-    function renderMonitoringActionListOnlyUnabsented(targetDate, unabsentedStudents, isPastSiangLimit) {
+    function renderMonitoringActionListFiltered(targetDate, studentItems, isPastLimit, selectedSessionFilter, selectedStatusFilter) {
       const container = document.getElementById('monitoring-student-action-list');
       const badgeEl = document.getElementById('monitoring-count-badge');
       const headerTitleEl = document.getElementById('monitoring-action-header-title');
 
-      if (!isPastSiangLimit) {
-        headerTitleEl.innerText = "Siswa Belum Melakukan Absen Pagi";
-        badgeEl.innerText = `${unabsentedStudents.length} Belum Absen Pagi`;
-        badgeEl.className = "text-[10px] text-amber-700 font-bold bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200";
-      } else {
-        headerTitleEl.innerText = "Siswa Belum Absen & Aksi Presensi";
-        badgeEl.innerText = `${unabsentedStudents.length} Siswa Belum Absen`;
-        badgeEl.className = "text-[10px] text-rose-600 font-bold bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200";
-      }
+      const modeText = selectedSessionFilter === "PAGI" ? "Pagi" : "Siang";
+      
+      headerTitleEl.innerText = `Daftar Siswa (${modeText})`;
+      badgeEl.innerText = `${studentItems.length} Siswa Filtered`;
+      badgeEl.className = "text-[10px] text-indigo-700 font-bold bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-200";
 
-      if (unabsentedStudents.length === 0) {
-        container.innerHTML = `<div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl text-center text-xs text-emerald-800 font-bold"><i class="fa-solid fa-circle-check"></i> Semua siswa pada kelas ini sudah melakukan presensi!</div>`;
+      if (studentItems.length === 0) {
+        container.innerHTML = `<div class="bg-gray-50 border border-gray-200 p-4 rounded-xl text-center text-xs text-gray-500 font-bold"><i class="fa-solid fa-circle-info"></i> Tidak ada siswa yang sesuai kriteria filter.</div>`;
         return;
       }
 
-      container.innerHTML = unabsentedStudents.map(std => {
+      container.innerHTML = studentItems.map(item => {
+        const std = item.student;
+        const st = item.status;
+        
+        let badgeStyle = "bg-gray-100 text-gray-700";
+        if (st === "HADIR") badgeStyle = "bg-emerald-100 text-emerald-800";
+        else if (st === "TERLAMBAT") badgeStyle = "bg-amber-100 text-amber-800";
+        else if (st === "ALPA") badgeStyle = "bg-red-100 text-red-800";
+        else if (st === "IZIN" || st === "SAKIT") badgeStyle = "bg-indigo-100 text-indigo-800";
+        else if (st === "KEGIATAN") badgeStyle = "bg-purple-100 text-purple-800";
+        else if (st === "BELUM") badgeStyle = "bg-amber-50 text-amber-700 border border-amber-200";
+
         return `
           <div id="action-item-${std.id_siswa}" class="p-2.5 bg-slate-50 border border-gray-200 rounded-xl space-y-1.5 transition-all duration-300">
             <div class="flex items-center justify-between">
@@ -1569,8 +1602,8 @@
                 <h5 class="font-bold text-xs text-gray-900 truncate">${std.nama}</h5>
                 <p class="text-[10px] text-gray-500">${std.kelas} | ID: ${std.id_siswa}</p>
               </div>
-              <span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full ${!isPastSiangLimit ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-800'}">
-                ${!isPastSiangLimit ? 'BELUM ABSEN PAGI' : 'BELUM SCAN'}
+              <span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full ${badgeStyle}">
+                ${st}
               </span>
             </div>
             <div class="grid grid-cols-4 gap-1.5 pt-1">
@@ -1588,12 +1621,13 @@
       const student = cachedStudents.find(s => s.id_siswa === idSiswa);
       if (!student) return;
       
+      const selectedSessionFilter = document.getElementById('monitoring-session-filter').value || "PAGI";
       const cleanTargetDate = formatCleanDateLocal(targetDate);
       const timeStr = padZeroTime((isManualTimeMode && customScanTimeOverride) ? customScanTimeOverride : new Date().toTimeString().split(' ')[0].substring(0, 5));
       const record = {
-        queue_id: `${cleanTargetDate}_${idSiswa}_${currentScanSession}`,
+        queue_id: `${cleanTargetDate}_${idSiswa}_${selectedSessionFilter}`,
         tanggal: cleanTargetDate, jam: timeStr, id_siswa: idSiswa,
-        nama: student.nama, kelas: student.kelas, sesi: currentScanSession,
+        nama: student.nama, kelas: student.kelas, sesi: selectedSessionFilter,
         status_presensi: status, status_manual: status, timestamp: Date.now()
       };
       await saveToAttendanceQueue(record);
@@ -1617,12 +1651,12 @@
       if (navigator.onLine) syncQueueToGAS();
     }
 
-    function renderPieChart(hadir, terlambat, alpa, bolos, sakit, izin, kegiatan, totalStudentsCount) {
+    function renderPieChart(hadir, terlambat, alpa, sakit, izin, kegiatan, totalStudentsCount) {
       const ctx = document.getElementById('attendancePieChart').getContext('2d');
       if (myPieChart) myPieChart.destroy();
 
       const totalHadirVal = hadir + terlambat;
-      const effectiveTotal = totalStudentsCount || (hadir + terlambat + alpa + bolos + sakit + izin + kegiatan);
+      const effectiveTotal = totalStudentsCount || (hadir + terlambat + alpa + sakit + izin + kegiatan);
       const percentVal = effectiveTotal > 0 ? Math.round((totalHadirVal / effectiveTotal) * 100) : 0;
       
       document.getElementById('chart-center-percent').innerText = `${percentVal}%`;
@@ -1630,8 +1664,8 @@
       myPieChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-          labels: ['Hadir', 'Terlambat', 'Alpa', 'Bolos', 'Sakit', 'Izin', 'Kegiatan'],
-          datasets: [{ data: [hadir, terlambat, alpa, bolos, sakit, izin, kegiatan], backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#f43f5e', '#3b82f6', '#6366f1', '#a855f7'] }]
+          labels: ['Hadir', 'Terlambat', 'Alpa', 'Sakit', 'Izin', 'Kegiatan'],
+          datasets: [{ data: [hadir, terlambat, alpa, sakit, izin, kegiatan], backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#6366f1', '#a855f7'] }]
         },
         options: { responsive: true, maintainAspectRatio: false, cutout: '72%', plugins: { legend: { display: false } } }
       });
@@ -1793,13 +1827,23 @@
       document.getElementById('camera-off-placeholder').classList.add('hidden');
       document.getElementById('scan-frame-box').classList.remove('hidden');
       isProcessingScan = false;
-      await html5QrCode.start({ facingMode: "environment" }, { fps: 15, qrbox: 250 }, onScanSuccess);
-      isCameraActive = true;
-      document.getElementById('btn-camera-text').innerText = "Matikan Kamera";
+      if (!isCameraActive) {
+        try {
+          await html5QrCode.start({ facingMode: "environment" }, { fps: 15, qrbox: 250 }, onScanSuccess);
+          isCameraActive = true;
+          document.getElementById('btn-camera-text').innerText = "Matikan Kamera";
+        } catch (err) {
+          console.error("Gagal memulai kamera:", err);
+        }
+      }
     }
 
     async function stopCamera() {
-      if (html5QrCode && isCameraActive) await html5QrCode.stop();
+      if (html5QrCode && isCameraActive) {
+        try {
+          await html5QrCode.stop();
+        } catch(e) {}
+      }
       isCameraActive = false;
       document.getElementById('btn-camera-text').innerText = "Nyalakan Kamera";
       document.getElementById('camera-off-placeholder').classList.remove('hidden');
@@ -1809,6 +1853,7 @@
     function toggleCameraState() { isCameraActive ? stopCamera() : initScanner(); }
 
     async function nextScanAndAutoStartCamera() {
+      isProcessingScan = false;
       toggleView('scanner');
       if (!isCameraActive) {
         await initScanner();
@@ -1833,7 +1878,7 @@
 
       if (!timeConfig.active) {
         alert(`Presensi Ditolak! Hari ${timeConfig.dayKey.toUpperCase()} diatur sebagai Hari Libur / Non-Aktif.`);
-        isProcessingScan = false;
+        setTimeout(() => { isProcessingScan = false; }, 1500);
         return;
       }
 
@@ -1844,7 +1889,7 @@
       if (currentScanSession === "PAGI") {
         if (timeStr < timeConfig.pStart) {
           alert(`Presensi Pagi Ditolak! Belum memasuki jam mulai pagi (${timeConfig.pStart}).`);
-          isProcessingScan = false;
+          setTimeout(() => { isProcessingScan = false; }, 1500);
           return;
         } else if (timeStr > timeConfig.pLimit) {
           computedStatus = "TERLAMBAT";
@@ -1852,10 +1897,12 @@
       } else if (currentScanSession === "SIANG") {
         if (timeStr < timeConfig.sStart) {
           alert(`Presensi Siang Ditolak! Belum memasuki jam mulai siang (${timeConfig.sStart}).`);
-          isProcessingScan = false;
+          setTimeout(() => { isProcessingScan = false; }, 1500);
           return;
         } else if (timeStr > timeConfig.sLimit) {
-          computedStatus = "TERLAMBAT";
+          alert(`Presensi Siang Ditolak! Jam scan (${timeStr}) telah melewati batas waktu siang (${timeConfig.sLimit}).`);
+          setTimeout(() => { isProcessingScan = false; }, 1500);
+          return;
         }
       }
 
@@ -1907,7 +1954,7 @@
 
         } else {
           alert("Siswa tidak ditemukan!");
-          isProcessingScan = false;
+          setTimeout(() => { isProcessingScan = false; }, 1500);
         }
       };
     }
