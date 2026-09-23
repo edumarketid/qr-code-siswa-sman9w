@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0b3c5d">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Sistem Absensi Murid - v2.30</title>
+  <title>Sistem Absensi Murid - v2.32</title>
   <link rel="manifest" href='data:application/manifest+json,{"name":"Sistem Absensi Murid","short_name":"AbsensiQR","start_url":"./index.html","display":"standalone","background_color":"#0b3c5d","theme_color":"#0b3c5d","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/3135/3135715.png","sizes":"512x512","type":"image/png"}]}'>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -22,6 +22,7 @@
 <body class="flex justify-center items-center h-full p-0 sm:p-4">
   <div id="app-viewport-container" class="w-full max-w-md h-full sm:h-[840px] bg-white flex flex-col shadow-2xl overflow-hidden sm:rounded-3xl relative border border-gray-200">
     
+    <!-- HEADER -->
     <header class="bg-[#0b3c5d] text-white py-3.5 px-4 z-40 shadow-md flex-shrink-0">
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-3">
@@ -36,7 +37,7 @@
             <span id="status-text" class="text-xs font-semibold">Memeriksa...</span>
           </div>
           <div class="flex items-center justify-end gap-1 mt-0.5">
-            <span id="app-version-tag" class="text-[10px] font-mono text-emerald-300 bg-emerald-950/60 px-1.5 py-0.2 rounded-md border border-emerald-500/30">v2.30</span>
+            <span id="app-version-tag" class="text-[10px] font-mono text-emerald-300 bg-emerald-950/60 px-1.5 py-0.2 rounded-md border border-emerald-500/30">v2.32</span>
             <span id="app-role-badge" onclick="handleRoleBadgeClick()" class="text-[10px] font-bold text-amber-300 bg-amber-950/60 px-1.5 py-0.2 rounded-md border border-amber-500/30 cursor-pointer select-none">PETUGAS</span>
           </div>
         </div>
@@ -105,6 +106,71 @@
         <button onclick="nextScanAndAutoStartCamera()" class="w-full mt-4 bg-blue-600 text-white font-semibold py-3 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md">
           <i class="fa-solid fa-qrcode"></i> Scan Siswa Berikutnya
         </button>
+      </main>
+
+      <!-- DASHBOARD BARU -->
+      <main id="view-dashboard" class="p-4 space-y-3.5 hidden pb-8">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="font-bold text-lg text-gray-900">Dashboard Utama</h2>
+            <p class="text-xs text-gray-500">Ringkasan Eksekutif & Filter Status Siswa</p>
+          </div>
+          <input type="date" id="dashboard-date-filter" onchange="renderDashboardView()" class="px-2 py-1 bg-white border border-gray-200 rounded-xl text-xs font-bold text-blue-900 shadow-sm">
+        </div>
+
+        <!-- KPI SUMMARY -->
+        <div class="grid grid-cols-2 gap-2">
+          <div class="bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-3 rounded-2xl shadow-sm">
+            <span class="block text-[10px] font-medium opacity-80">Tingkat Kehadiran</span>
+            <span id="dash-pct-total" class="text-2xl font-black">0%</span>
+            <span id="dash-pct-sub" class="block text-[9px] opacity-80 mt-1">0 dari 0 Siswa</span>
+          </div>
+          <div class="bg-white border border-gray-200 p-3 rounded-2xl shadow-sm grid grid-cols-2 gap-1 text-center">
+            <div class="bg-emerald-50 rounded-lg p-1"><span class="block text-[8px] font-bold text-emerald-700">HADIR</span><span id="dash-count-hadir" class="text-sm font-black text-emerald-800">0</span></div>
+            <div class="bg-amber-50 rounded-lg p-1"><span class="block text-[8px] font-bold text-amber-700">TERLAMBAT</span><span id="dash-count-terlambat" class="text-sm font-black text-amber-800">0</span></div>
+            <div class="bg-rose-50 rounded-lg p-1"><span class="block text-[8px] font-bold text-rose-700">ALPA</span><span id="dash-count-alpa" class="text-sm font-black text-rose-800">0</span></div>
+            <div class="bg-indigo-50 rounded-lg p-1"><span class="block text-[8px] font-bold text-indigo-700">IZIN/SAKIT</span><span id="dash-count-izinsakit" class="text-sm font-black text-indigo-800">0</span></div>
+          </div>
+        </div>
+
+        <!-- GRAFIK PIE & REKAP KELAS -->
+        <div class="bg-white p-3.5 rounded-2xl border border-gray-200 shadow-sm space-y-3">
+          <h3 class="font-bold text-xs text-gray-800 border-b border-gray-100 pb-1.5 flex items-center justify-between">
+            <span>Proporsi Presensi Harian</span>
+            <i class="fa-solid fa-chart-pie text-blue-600"></i>
+          </h3>
+          <div class="w-36 h-36 mx-auto relative flex items-center justify-center">
+            <canvas id="dashboardPieChart"></canvas>
+          </div>
+        </div>
+
+        <!-- REKAP PER KELAS RINGKAS -->
+        <div class="bg-white p-3.5 rounded-2xl border border-gray-200 shadow-sm space-y-2">
+          <h3 class="font-bold text-xs text-gray-800 border-b border-gray-100 pb-1.5"><i class="fa-solid fa-school text-indigo-600"></i> Ringkasan Per Kelas</h3>
+          <div id="dashboard-class-summary" class="space-y-1.5 max-h-48 overflow-y-auto no-scrollbar pr-0.5"></div>
+        </div>
+
+        <!-- FILTER TABEL STATUS SISWA -->
+        <div class="bg-white p-3.5 rounded-2xl border border-gray-200 shadow-sm space-y-2.5">
+          <h3 class="font-bold text-xs text-gray-800 border-b border-gray-100 pb-1.5"><i class="fa-solid fa-filter text-emerald-600"></i> Daftar Siswa Berdasarkan Status</h3>
+          <div class="grid grid-cols-2 gap-2">
+            <select id="dash-filter-class" onchange="renderDashboardStudentTable()" class="px-2 py-1.5 bg-slate-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700">
+              <option value="ALL">Semua Kelas</option>
+            </select>
+            <select id="dash-filter-status" onchange="renderDashboardStudentTable()" class="px-2 py-1.5 bg-slate-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700">
+              <option value="ALL">Semua Status</option>
+              <option value="HADIR">Hadir</option>
+              <option value="TERLAMBAT">Terlambat</option>
+              <option value="ALPA">Alpa</option>
+              <option value="IZIN">Izin</option>
+              <option value="SAKIT">Sakit</option>
+              <option value="BOLOS">Bolos</option>
+            </select>
+          </div>
+          <input type="text" id="dash-search-student" onkeyup="renderDashboardStudentTable()" placeholder="Cari nama siswa..." class="w-full px-3 py-1.5 bg-slate-50 border border-gray-200 rounded-xl text-xs">
+          
+          <div id="dash-student-table-container" class="space-y-1.5 max-h-60 overflow-y-auto no-scrollbar pr-0.5"></div>
+        </div>
       </main>
 
       <!-- MASTER SISWA -->
@@ -226,7 +292,7 @@
         </div>
       </main>
 
-      <!-- DONASI -->
+      <!-- DONASI (SEKARANG DIPINDAH KE MODAL MENU UTAMA) -->
       <main id="view-donation" class="p-4 hidden">
         <div class="text-center mb-3">
           <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-2 text-xl shadow-sm"><i class="fa-solid fa-hand-holding-heart"></i></div>
@@ -269,7 +335,7 @@
           <h3 class="font-bold text-xs text-blue-900 border-b border-gray-100 pb-1.5">APLIKASI</h3>
           <div class="flex justify-between text-xs">
             <span class="text-gray-500">Versi Aplikasi</span>
-            <span class="font-bold text-gray-900">v2.30</span>
+            <span class="font-bold text-gray-900">v2.32</span>
           </div>
           <div class="flex justify-between text-xs">
             <span class="text-gray-500">Status Update</span>
@@ -388,6 +454,23 @@
       </main>
     </div>
 
+    <!-- MODAL DETAIL RINGKAS SISWA -->
+    <div id="student-detail-modal" class="absolute inset-0 bg-black/60 backdrop-blur-sm z-50 flex flex-col justify-end hidden">
+      <div class="bg-white rounded-t-3xl p-5 space-y-3 shadow-2xl max-h-[80%] overflow-y-auto">
+        <div class="flex items-center justify-between border-b border-gray-100 pb-2">
+          <div>
+            <h3 id="modal-std-name" class="font-bold text-gray-900 text-sm">-</h3>
+            <p id="modal-std-sub" class="text-[10px] text-gray-500">-</p>
+          </div>
+          <button onclick="closeStudentDetailModal()" class="w-7 h-7 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center"><i class="fa-solid fa-xmark text-sm"></i></button>
+        </div>
+        <div class="space-y-2">
+          <h4 class="text-xs font-bold text-gray-700">Ringkasan Kehadiran Hari Ini:</h4>
+          <div id="modal-std-status-content" class="p-3 bg-slate-50 rounded-xl text-xs space-y-1 border border-gray-200"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- MODAL TAMBAH SISWA -->
     <div id="add-student-modal" class="absolute inset-0 bg-black/60 backdrop-blur-sm z-50 flex flex-col justify-end hidden">
       <div class="bg-white rounded-t-3xl p-5 space-y-3 shadow-2xl">
@@ -449,7 +532,7 @@
         <span class="text-[10px] font-bold text-teal-700 mt-0.5">Data Siswa</span>
       </button>
       <button id="nav-monitoring" onclick="toggleView('monitoring')" class="flex-1 flex flex-col items-center">
-        <i class="fa-solid fa-chart-pie text-sm text-indigo-600"></i>
+        <i class="fa-solid fa-chart-line text-sm text-indigo-600"></i>
         <span class="text-[10px] font-bold text-indigo-700 mt-0.5">Monitoring</span>
       </button>
       <button id="nav-scanner" onclick="toggleView('scanner')" class="flex-1 text-blue-600 flex flex-col items-center -mt-4">
@@ -458,9 +541,9 @@
         </div>
         <span class="text-[10px] font-bold mt-0.5">Scanner</span>
       </button>
-      <button id="nav-donation" onclick="toggleView('donation')" class="flex-1 flex flex-col items-center">
-        <i class="fa-solid fa-hand-holding-heart text-sm text-rose-500"></i>
-        <span class="text-[10px] font-bold text-rose-600 mt-0.5">Donasi</span>
+      <button id="nav-dashboard" onclick="toggleView('dashboard')" class="flex-1 flex flex-col items-center">
+        <i class="fa-solid fa-chart-pie text-sm text-rose-500"></i>
+        <span class="text-[10px] font-bold text-rose-600 mt-0.5">Dashboard</span>
       </button>
       <button onclick="toggleMenuModal()" class="flex-1 flex flex-col items-center">
         <i class="fa-solid fa-bars text-sm text-amber-600"></i>
@@ -490,11 +573,12 @@
 
     let html5QrCode = null, isCameraActive = false, db = null, cachedStudents = [];
     let fetchedTodayAttendance = [], fetchedAttendanceHistory = [], fetchedTindakLanjutHistory = [], fetchedHariLiburList = [];
-    let currentScanSession = "PAGI", myPieChart = null, myBarChart = null;
+    let currentScanSession = "PAGI", myPieChart = null, myBarChart = null, dashboardPieChart = null;
     let isManualTimeMode = false;
     let customScanDateOverride = null;
     let customScanTimeOverride = null;
     let currentUserRole = "PETUGAS"; 
+    let isProcessingScan = false;
 
     const DAYS_LIST = [
       { key: "sun", label: "Minggu (Ekstrakurikuler)" },
@@ -621,6 +705,7 @@
         { label: "Pindah/Naik Kelas", icon: "fa-graduation-cap", color: "indigo", action: "toggleView('promotion')", adminOnly: true },
         { label: "Laporan Rekap", icon: "fa-file-invoice", color: "emerald", action: "bukaHalamanLaporan()", adminOnly: true },
         { label: "Cetak QR Code", icon: "fa-print", color: "indigo", action: "bukaHalamanCetakQR()", adminOnly: true },
+        { label: "Dukung Donasi", icon: "fa-hand-holding-heart", color: "rose", action: "toggleView('donation')", adminOnly: false },
         { label: "Tentang Aplikasi", icon: "fa-circle-info", color: "teal", action: "toggleView('about')", adminOnly: false },
         { label: "Pengaturan", icon: "fa-gear", color: "purple", action: "toggleView('settings')", adminOnly: true }
       ];
@@ -1007,6 +1092,7 @@
               loadStudentsView();
               populateClassDropdowns();
               updateMonitoringDashboard();
+              renderDashboardView();
             };
           }
         }
@@ -1027,6 +1113,7 @@
         tx.objectStore("attendance_history").getAll().onsuccess = (e) => {
           fetchedAttendanceHistory = e.target.result || [];
           updateMonitoringDashboard();
+          renderDashboardView();
         };
       }
     }
@@ -1038,20 +1125,12 @@
       const stdFilter = document.getElementById('filter-class-select');
       const monFilter = document.getElementById('monitoring-class-filter');
       const promFilter = document.getElementById('promote-from-class');
-      const stdValBefore = stdFilter ? stdFilter.value : "ALL";
-      const monValBefore = monFilter ? monFilter.value : "ALL";
+      const dashFilter = document.getElementById('dash-filter-class');
 
-      if (stdFilter) {
-        stdFilter.innerHTML = optionsHtml;
-        if (classes.includes(stdValBefore)) stdFilter.value = stdValBefore;
-      }
-      if (monFilter) {
-        monFilter.innerHTML = optionsHtml;
-        if (classes.includes(monValBefore)) monFilter.value = monValBefore;
-      }
-      if (promFilter) {
-        promFilter.innerHTML = classes.map(c => `<option value="${c}">${c}</option>`).join('');
-      }
+      if (stdFilter) stdFilter.innerHTML = optionsHtml;
+      if (monFilter) monFilter.innerHTML = optionsHtml;
+      if (dashFilter) dashFilter.innerHTML = optionsHtml;
+      if (promFilter) promFilter.innerHTML = classes.map(c => `<option value="${c}">${c}</option>`).join('');
     }
 
     async function loadStudentsView() {
@@ -1100,13 +1179,8 @@
     }
 
     function generateNextStudentId() {
-      if (!cachedStudents || cachedStudents.length === 0) {
-        return "S101";
-      }
-
-      let maxNum = 0;
-      let prefix = "S";
-
+      if (!cachedStudents || cachedStudents.length === 0) return "S101";
+      let maxNum = 0, prefix = "S";
       cachedStudents.forEach(s => {
         if (s.id_siswa) {
           const cleanId = String(s.id_siswa).trim();
@@ -1114,31 +1188,23 @@
           if (match) {
             prefix = match[1]; 
             const num = parseInt(match[2], 10);
-            if (!isNaN(num) && num > maxNum) {
-              maxNum = num;
-            }
+            if (!isNaN(num) && num > maxNum) maxNum = num;
           } else {
             const numOnly = parseInt(cleanId.replace(/\D/g, ''), 10);
-            if (!isNaN(numOnly) && numOnly > maxNum) {
-              maxNum = numOnly;
-            }
+            if (!isNaN(numOnly) && numOnly > maxNum) maxNum = numOnly;
           }
         }
       });
-
-      if (maxNum === 0) {
-        return "S101";
-      }
-
-      return prefix + (maxNum + 1);
+      return maxNum === 0 ? "S101" : prefix + (maxNum + 1);
     }
 
     function toggleView(viewName) {
-      const views = ['scanner', 'success', 'students', 'monitoring', 'donation', 'about', 'tindak-lanjut', 'hari-libur', 'settings', 'promotion'];
+      const views = ['scanner', 'success', 'students', 'monitoring', 'dashboard', 'donation', 'about', 'tindak-lanjut', 'hari-libur', 'settings', 'promotion'];
       views.forEach(v => document.getElementById('view-' + v).classList.add('hidden'));
       document.getElementById('view-' + viewName).classList.remove('hidden');
       if (viewName === 'students') loadStudentsView();
       if (viewName === 'monitoring') onMonitoringDateChange();
+      if (viewName === 'dashboard') renderDashboardView();
       if (viewName === 'tindak-lanjut') renderTindakLanjutView();
       if (viewName === 'hari-libur') renderHariLiburView();
       if (viewName === 'settings') renderDaysConfigForm();
@@ -1165,12 +1231,187 @@
       modal.classList.toggle('hidden'); 
     }
 
+    /* FITUR APLIKASI DASHBOARD */
+    async function renderDashboardView() {
+      const targetDate = formatCleanDateLocal(document.getElementById('dashboard-date-filter').value) || new Date().toISOString().split('T')[0];
+      document.getElementById('dashboard-date-filter').value = targetDate;
+      
+      const queueRecords = await getAllQueueFromDB();
+      const localHist = await getAllLocalHistoryFromDB();
+      
+      const rawRecords = [...fetchedTodayAttendance, ...fetchedAttendanceHistory, ...localHist, ...queueRecords].filter(r => formatCleanDateLocal(r.tanggal) === targetDate);
+
+      let totalStd = cachedStudents.length;
+      let countHadir = 0, countTerlambat = 0, countAlpa = 0, countIzin = 0, countSakit = 0, countBolos = 0;
+
+      cachedStudents.forEach(std => {
+        const rec = rawRecords.find(r => String(r.id_siswa).trim().toUpperCase() === String(std.id_siswa).trim().toUpperCase());
+        if (!rec) {
+          countAlpa++;
+        } else {
+          const st = String(rec.status_akhir || rec.status_presensi || "HADIR").toUpperCase();
+          if (st === "HADIR") countHadir++;
+          else if (st === "TERLAMBAT") countTerlambat++;
+          else if (st === "ALPA") countAlpa++;
+          else if (st === "IZIN") countIzin++;
+          else if (st === "SAKIT") countSakit++;
+          else if (st === "BOLOS") countBolos++;
+          else countHadir++;
+        }
+      });
+
+      const totalKehadiranVal = countHadir + countTerlambat;
+      const pctHadir = totalStd > 0 ? Math.round((totalKehadiranVal / totalStd) * 100) : 0;
+
+      document.getElementById('dash-pct-total').innerText = `${pctHadir}%`;
+      document.getElementById('dash-pct-sub').innerText = `${totalKehadiranVal} dari ${totalStd} Siswa Hadir`;
+      document.getElementById('dash-count-hadir').innerText = countHadir;
+      document.getElementById('dash-count-terlambat').innerText = countTerlambat;
+      document.getElementById('dash-count-alpa').innerText = countAlpa;
+      document.getElementById('dash-count-izinsakit').innerText = countIzin + countSakit;
+
+      renderDashboardPieChart(countHadir, countTerlambat, countAlpa, countIzin + countSakit, countBolos);
+      renderDashboardClassSummary(rawRecords);
+      renderDashboardStudentTable();
+    }
+
+    function renderDashboardPieChart(hadir, terlambat, alpa, izinsakit, bolos) {
+      const ctx = document.getElementById('dashboardPieChart').getContext('2d');
+      if (dashboardPieChart) dashboardPieChart.destroy();
+
+      dashboardPieChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Hadir', 'Terlambat', 'Alpa', 'Izin/Sakit', 'Bolos'],
+          datasets: [{
+            data: [hadir, terlambat, alpa, izinsakit, bolos],
+            backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#6366f1', '#f43f5e']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '65%',
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    function renderDashboardClassSummary(rawRecords) {
+      const container = document.getElementById('dashboard-class-summary');
+      const classes = [...new Set(cachedStudents.map(s => s.kelas))].filter(Boolean).sort();
+
+      if (classes.length === 0) {
+        container.innerHTML = `<div class="text-[10px] text-gray-400 text-center py-2">Belum ada data kelas.</div>`;
+        return;
+      }
+
+      container.innerHTML = classes.map(cls => {
+        const stds = cachedStudents.filter(s => s.kelas === cls);
+        let hadirVal = 0;
+        stds.forEach(std => {
+          const rec = rawRecords.find(r => String(r.id_siswa).trim().toUpperCase() === String(std.id_siswa).trim().toUpperCase());
+          if (rec) {
+            const st = String(rec.status_akhir || rec.status_presensi || "HADIR").toUpperCase();
+            if (st === "HADIR" || st === "TERLAMBAT") hadirVal++;
+          }
+        });
+        const pct = stds.length > 0 ? Math.round((hadirVal / stds.length) * 100) : 0;
+        return `
+          <div class="p-2 bg-slate-50 border border-gray-100 rounded-xl flex items-center justify-between text-xs">
+            <div>
+              <span class="font-bold text-gray-800">${cls}</span>
+              <p class="text-[10px] text-gray-500">${hadirVal} dari ${stds.length} siswa hadir</p>
+            </div>
+            <span class="font-black text-xs ${pct >= 85 ? 'text-emerald-600' : 'text-amber-600'}">${pct}%</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function renderDashboardStudentTable() {
+      const targetDate = formatCleanDateLocal(document.getElementById('dashboard-date-filter').value) || new Date().toISOString().split('T')[0];
+      const selectedClass = document.getElementById('dash-filter-class').value;
+      const selectedStatus = document.getElementById('dash-filter-status').value;
+      const searchQ = document.getElementById('dash-search-student').value.toLowerCase();
+
+      const queueRecords = await getAllQueueFromDB();
+      const localHist = await getAllLocalHistoryFromDB();
+      const rawRecords = [...fetchedTodayAttendance, ...fetchedAttendanceHistory, ...localHist, ...queueRecords].filter(r => formatCleanDateLocal(r.tanggal) === targetDate);
+
+      const container = document.getElementById('dash-student-table-container');
+
+      const filtered = cachedStudents.filter(std => {
+        const matchClass = (selectedClass === "ALL" || std.kelas === selectedClass);
+        const matchQ = std.nama.toLowerCase().includes(searchQ) || std.id_siswa.toLowerCase().includes(searchQ);
+        
+        const rec = rawRecords.find(r => String(r.id_siswa).trim().toUpperCase() === String(std.id_siswa).trim().toUpperCase());
+        const status = rec ? String(rec.status_akhir || rec.status_presensi || "HADIR").toUpperCase() : "ALPA";
+        const matchStatus = (selectedStatus === "ALL" || status === selectedStatus);
+
+        return matchClass && matchQ && matchStatus;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="text-xs text-gray-400 text-center py-3">Tidak ada siswa yang sesuai filter.</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(std => {
+        const rec = rawRecords.find(r => String(r.id_siswa).trim().toUpperCase() === String(std.id_siswa).trim().toUpperCase());
+        const status = rec ? String(rec.status_akhir || rec.status_presensi || "HADIR").toUpperCase() : "ALPA";
+        const jamScan = rec ? (rec.jam || rec.jam_pagi || "-") : "-";
+
+        let badgeStyle = "bg-gray-100 text-gray-700";
+        if (status === "HADIR") badgeStyle = "bg-emerald-100 text-emerald-800";
+        else if (status === "TERLAMBAT") badgeStyle = "bg-amber-100 text-amber-800";
+        else if (status === "ALPA") badgeStyle = "bg-rose-100 text-rose-800";
+        else if (status === "IZIN" || status === "SAKIT") badgeStyle = "bg-indigo-100 text-indigo-800";
+
+        return `
+          <div onclick="showStudentDetailModal('${std.id_siswa}')" class="p-2.5 bg-slate-50 border border-gray-100 rounded-xl flex items-center justify-between cursor-pointer hover:bg-slate-100 transition">
+            <div>
+              <h5 class="font-bold text-xs text-gray-900">${std.nama}</h5>
+              <p class="text-[10px] text-gray-500">${std.kelas} | Jam: ${jamScan}</p>
+            </div>
+            <span class="text-[9px] font-extrabold px-2 py-0.5 rounded-md ${badgeStyle}">${status}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function showStudentDetailModal(idSiswa) {
+      const std = cachedStudents.find(s => s.id_siswa === idSiswa);
+      if (!std) return;
+
+      document.getElementById('modal-std-name').innerText = std.nama;
+      document.getElementById('modal-std-sub').innerText = `Kelas: ${std.kelas} | ID: ${std.id_siswa} | NISN: ${std.nisn || '-'}`;
+
+      const targetDate = formatCleanDateLocal(document.getElementById('dashboard-date-filter').value) || new Date().toISOString().split('T')[0];
+      const rec = [...fetchedTodayAttendance, ...fetchedAttendanceHistory].find(r => String(r.id_siswa).trim().toUpperCase() === String(idSiswa).trim().toUpperCase() && formatCleanDateLocal(r.tanggal) === targetDate);
+
+      const contentEl = document.getElementById('modal-std-status-content');
+      if (rec) {
+        contentEl.innerHTML = `
+          <p>Tanggal: <b>${rec.tanggal}</b></p>
+          <p>Jam Scan: <b>${rec.jam || rec.jam_pagi || '-'}</b></p>
+          <p>Status Presensi: <b class="text-blue-700">${rec.status_akhir || rec.status_presensi || 'HADIR'}</b></p>
+        `;
+      } else {
+        contentEl.innerHTML = `<p class="text-rose-600 font-bold">Belum Melakukan Absensi / Tanpa Keterangan (Alpa)</p>`;
+      }
+
+      document.getElementById('student-detail-modal').classList.remove('hidden');
+    }
+
+    function closeStudentDetailModal() {
+      document.getElementById('student-detail-modal').classList.add('hidden');
+    }
+
     function onMonitoringDateChange() {
       const targetDate = formatCleanDateLocal(document.getElementById('monitoring-date-filter').value) || new Date().toISOString().split('T')[0];
       updateMonitoringDashboard();
-      if (navigator.onLine) {
-        autoDownloadMasterStudents(targetDate);
-      }
+      if (navigator.onLine) autoDownloadMasterStudents(targetDate);
     }
 
     async function updateMonitoringDashboard() {
@@ -1205,9 +1446,7 @@
         const stdRec = rawRecords.find(r => String(r.id_siswa).trim().toUpperCase() === String(std.id_siswa).trim().toUpperCase());
         
         if (!stdRec) {
-          if (isPastSiangLimit) {
-            alpa++;
-          }
+          if (isPastSiangLimit) alpa++;
           unabsentedStudents.push(std);
         } else {
           const jamPagi = stdRec.jam_pagi || (stdRec.sesi === "PAGI" ? stdRec.jam : "");
@@ -1217,22 +1456,14 @@
           if (stAkhir === "ALPA") {
             alpa++;
             unabsentedStudents.push(std);
-          } else if (stAkhir === "BOLOS") {
-            bolos++;
-          } else if (stAkhir === "IZIN") {
-            izin++;
-          } else if (stAkhir === "SAKIT") {
-            sakit++;
-          } else if (stAkhir === "KEGIATAN") {
-            kegiatan++;
-          } else if (stAkhir === "TERLAMBAT" || stdRec.status_pagi === "TERLAMBAT" || stdRec.status_siang === "TERLAMBAT") {
-            terlambat++;
-          } else if (stAkhir === "HADIR") {
-            if (jamPagi && !jamSiang && isPastSiangLimit) {
-              bolos++;
-            } else {
-              hadir++;
-            }
+          } else if (stAkhir === "BOLOS") bolos++;
+          else if (stAkhir === "IZIN") izin++;
+          else if (stAkhir === "SAKIT") sakit++;
+          else if (stAkhir === "KEGIATAN") kegiatan++;
+          else if (stAkhir === "TERLAMBAT" || stdRec.status_pagi === "TERLAMBAT" || stdRec.status_siang === "TERLAMBAT") terlambat++;
+          else if (stAkhir === "HADIR") {
+            if (jamPagi && !jamSiang && isPastSiangLimit) bolos++;
+            else hadir++;
           }
         }
       });
@@ -1376,9 +1607,11 @@
         itemEl.classList.add('opacity-0', 'scale-95');
         setTimeout(() => {
           updateMonitoringDashboard();
+          renderDashboardView();
         }, 200);
       } else {
         updateMonitoringDashboard();
+        renderDashboardView();
       }
 
       if (navigator.onLine) syncQueueToGAS();
@@ -1559,6 +1792,7 @@
       if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
       document.getElementById('camera-off-placeholder').classList.add('hidden');
       document.getElementById('scan-frame-box').classList.remove('hidden');
+      isProcessingScan = false;
       await html5QrCode.start({ facingMode: "environment" }, { fps: 15, qrbox: 250 }, onScanSuccess);
       isCameraActive = true;
       document.getElementById('btn-camera-text').innerText = "Matikan Kamera";
@@ -1582,8 +1816,9 @@
     }
 
     async function onScanSuccess(text) {
-      await stopCamera();
-      
+      if (isProcessingScan) return; 
+      isProcessingScan = true;
+
       let nowDateObj = new Date();
       let dateStr = nowDateObj.toISOString().split('T')[0];
       let timeStr = padZeroTime(nowDateObj.toTimeString().split(' ')[0].substring(0, 5));
@@ -1598,7 +1833,8 @@
 
       if (!timeConfig.active) {
         alert(`Presensi Ditolak! Hari ${timeConfig.dayKey.toUpperCase()} diatur sebagai Hari Libur / Non-Aktif.`);
-        return initScanner();
+        isProcessingScan = false;
+        return;
       }
 
       autoDetectOrSyncSessionMode(timeStr, nowDateObj);
@@ -1608,14 +1844,16 @@
       if (currentScanSession === "PAGI") {
         if (timeStr < timeConfig.pStart) {
           alert(`Presensi Pagi Ditolak! Belum memasuki jam mulai pagi (${timeConfig.pStart}).`);
-          return initScanner();
+          isProcessingScan = false;
+          return;
         } else if (timeStr > timeConfig.pLimit) {
           computedStatus = "TERLAMBAT";
         }
       } else if (currentScanSession === "SIANG") {
         if (timeStr < timeConfig.sStart) {
           alert(`Presensi Siang Ditolak! Belum memasuki jam mulai siang (${timeConfig.sStart}).`);
-          return initScanner();
+          isProcessingScan = false;
+          return;
         } else if (timeStr > timeConfig.sLimit) {
           computedStatus = "TERLAMBAT";
         }
@@ -1660,10 +1898,16 @@
             statusCardBox.className = "bg-emerald-50 border border-emerald-200 rounded-2xl p-4 text-center shadow-sm space-y-2";
             badgeBox.className = "text-emerald-600 font-extrabold text-xl";
           }
+          
           toggleView('success');
+
+          setTimeout(async () => {
+            await nextScanAndAutoStartCamera();
+          }, 1800);
+
         } else {
           alert("Siswa tidak ditemukan!");
-          initScanner();
+          isProcessingScan = false;
         }
       };
     }
@@ -1755,7 +1999,10 @@
         document.getElementById("input-school-name").value = localSchoolName;
         document.getElementById("input-academic-year").value = localAcadYear;
       }
-      document.getElementById("monitoring-date-filter").value = new Date().toISOString().split('T')[0];
+      const todayStr = new Date().toISOString().split('T')[0];
+      document.getElementById("monitoring-date-filter").value = todayStr;
+      document.getElementById("dashboard-date-filter").value = todayStr;
+
       await initDatabase();
       await loadStudentsView();
       renderDaysConfigForm();
